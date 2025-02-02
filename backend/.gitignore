@@ -1,0 +1,6 @@
+# Supabase
+.branches
+.temp
+
+# Node modules
+node_modules/
