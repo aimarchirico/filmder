@@ -4,4 +4,4 @@ type(scope): Short title
 
 Detailed explanation of changes. 
 
-co-authored by: [name] 
+co-authored by: [name]
