@@ -1,0 +1,30 @@
+/* styles/globals.css */
+
+/* Tailwind's default styles */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom global theme styles */
+:root {
+  --primary-color: #1e40af; /* Example primary color */
+  --secondary-color: #9333ea; /* Example secondary color */
+}
+
+body {
+  font-family: 'Roboto', sans-serif; /* Example font */
+  background-color: var(--primary-color);
+  color: white;
+}
+
+h1 {
+  color: var(--secondary-color);
+}
+
+/* Example of applying Tailwind with custom theme */
+.bg-primary {
+  background-color: var(--primary-color);
+}
+.text-secondary {
+  color: var(--secondary-color);
+}
