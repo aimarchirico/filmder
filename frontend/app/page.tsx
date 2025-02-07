@@ -1,10 +1,10 @@
 import { createClient } from '@/utils/supabase/client';
 
-export default async function Countries() {
+export default async function Movies() {
   const supabase = await createClient();
-  const { data: countries } = await supabase.from("countries").select();
+  const { data: movies } = await supabase.from("movies").select();
         
   return <><p>Filmder av gruppe 28!</p>
   <p>Koblet til Supabase!</p>
-  <pre>{JSON.stringify(countries, null, 2)}</pre></>
+  <pre>{JSON.stringify(movies, null, 2)}</pre></>
 }
