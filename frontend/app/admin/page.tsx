@@ -1,10 +1,23 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
+import { redirect } from 'next/navigation';
 
-export default function Movies() {
+export default function AdminPage() {
   const [movies, setMovies] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function checkAdmin() {
+      const supabase = createClient()
+      const { data: adminCheck } = await supabase.functions.invoke('check-admin')
+      
+      if (!adminCheck?.is_admin) {
+        redirect('/')
+      }
+    }
+    checkAdmin()
+  }, [])
 
   const handleInitializeMovies = async () => {
     const supabase = createClient();
@@ -24,6 +37,8 @@ export default function Movies() {
       
     setMovies(moviesData ?? []);
   };
+
+
 
   useEffect(() => {
     async function fetchData() {
