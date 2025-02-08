@@ -65,12 +65,9 @@ const fetchAndSetMovies = async (supabase: any) => {
     genre_ids: movie.genre_ids
   }))
 
-  await supabase.from("movies").delete().neq('id', 0)
-
-
   const { error } = await supabase
     .from("movies")
-    .insert(movies.map(({genre_ids, ...movie}) => movie))
+    .upsert(movies.map(({genre_ids, ...movie}) => movie))
     .select()
 
   if (error) throw error
@@ -94,12 +91,52 @@ const setMovieGenres = async (supabase: any, movies: any[]) => {
 }
 
 
-serve(async () => {
+serve(async (req) => {
+  // Add CORS headers
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
+
   try {
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? ""
-    )
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+    );
+
+    // Add CORS headers to all responses
+    const authHeader = req.headers.get('Authorization')?.split('Bearer ')[1];
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }), 
+        { 
+          status: 401,
+          headers: corsHeaders 
+        }
+      );
+    }
+
+    // Get user from JWT
+    const { data: { user }, error: userError } = await supabase.auth.getUser(authHeader)
+    if (userError || !user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 404 })
+    }
+
+    // Check if user is admin
+    const { data: adminData } = await supabase
+      .from('admins')
+      .select()
+      .eq('id', user.id)
+      .single()
+
+    if (!adminData) {
+      return new Response(JSON.stringify({ error: 'Admin access required' }), { status: 403 })
+    }
 
     const genres = await fetchAndSetGenres(supabase)
     const movies = await fetchAndSetMovies(supabase)
@@ -111,12 +148,20 @@ serve(async () => {
         movies: movies.length, 
         relationships: movieGenres.length 
       }),
-      { headers: { "Content-Type": "application/json" } }
+      { 
+        headers: { 
+          "Content-Type": "application/json",
+          ...corsHeaders
+        } 
+      }
     )
   } catch (error) {
     return new Response(
-      JSON.stringify({ error: error.message }),
-      { headers: { "Content-Type": "application/json" }, status: 400 }
-    )
+      JSON.stringify({ error: error.message }), 
+      { 
+        status: 500,
+        headers: corsHeaders
+      }
+    );
   }
 })
