@@ -1,10 +1,6 @@
-  "use client"
-
 import { login, signup } from "./actions";
-import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-  const router = useRouter();
 
   return (
     <div className="flex min-h-screen">
@@ -57,7 +53,7 @@ export default function LoginPage() {
                 Don't have an account?
                 <button
                   type="button"
-                  onClick={() => router.push("/signup")}
+                  formAction={signup}
                   className="w-full bg-white hover:bg-gray-800 font-medium py-3 rounded-2xl transition text-primary hover:text-gray"
                 >
                   Sign up
