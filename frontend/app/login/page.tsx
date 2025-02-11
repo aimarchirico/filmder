@@ -6,7 +6,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen">
       {/* Left Section (Login Form) */}
       <div className="flex w-2/3 items-center justify-center p-6 bg-primary">
-        <div className="w-full max-w-md shadow-lg rounded-lg p-8">
+        <div className="w-full max-w-md shadow-lg rounded-2xl p-8 border-4 border-secondary">
           <h2 className="text-2xl font-semibold text-center text-white mb-6">
             Welcome Back!
           </h2>
@@ -45,6 +45,7 @@ export default function LoginPage() {
             <div className="flex flex-col gap-2">
               <button
                 formAction={login}
+                // legg til 'startside' navigasjon 
                 className="w-full bg-secondary hover:bg-purple-700 text-white font-medium py-3 rounded-2xl transition"
               >
                 Log in
@@ -53,6 +54,7 @@ export default function LoginPage() {
                 Don't have an account?
                 <button
                   type="button"
+                  // legg til 'signup' navigasjon
                   formAction={signup}
                   className="w-full bg-white hover:bg-gray-800 font-medium py-3 rounded-2xl transition text-primary hover:text-gray"
                 >
