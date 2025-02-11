@@ -10,11 +10,10 @@ export default {
     './src/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
-    
     extend: {
       colors: {
-        'primary': '#0E0E0E',      // Custom primary color (black)
-        'secondary': '#7352E4',
+        'primary': 'var(--primary-color)',      // Custom primary color (black)
+        'secondary': 'var(--secondary-color)',
       }
     },
   },
