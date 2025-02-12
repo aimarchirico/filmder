@@ -1,26 +1,29 @@
-'use server'
+"use server";
 
-import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
-
-import { createClient } from '@/utils/supabase/server'
+import { createClient } from "@/utils/supabase/server"; // ✅ Use your existing server client
 
 export async function signup(formData: FormData) {
-  const supabase = await createClient()
+  const supabase = await createClient(); // ✅ Use your existing function
 
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
-  const data = {
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+  const fullName = formData.get("fullName") as string;
+
+  if (!email || !password || !fullName) {
+    return { error: "All fields are required", success: null };
   }
 
-  const { error } = await supabase.auth.signUp(data)
+  const { error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: { fullName },
+    },
+  });
 
   if (error) {
-    redirect('/error')
+    return { error: error.message, success: null }; // ✅ Always return an object
   }
 
-  revalidatePath('/', 'layout')
-  redirect('/')
+  return { error: null, success: "Signup successful! Please check your email." };
 }
