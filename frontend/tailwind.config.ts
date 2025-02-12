@@ -10,7 +10,12 @@ export default {
     './src/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        'primary': 'var(--primary-color)',      // Custom primary color (black)
+        'secondary': 'var(--secondary-color)',
+      }
+    },
   },
   plugins: [],
 } satisfies Config
