@@ -25,20 +25,13 @@ export default function HomePage() {
           <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
             <div className="py-1">
               
-              <Link 
-                href="/profile" 
+              <Link
+                href="/filmer"
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              >
-                Profile
+                >
+                Filmer
               </Link>
-              
-              <Link 
-                href="/settings" 
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              >
-                Settings
-              </Link>
-              
+                  
               <Link 
                 href="/friends" 
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
