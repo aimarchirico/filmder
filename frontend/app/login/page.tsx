@@ -1,6 +1,9 @@
-import { login, signup } from "./actions";
+"use client";
+import { login } from "./actions";
+import { useRouter } from "next/navigation"; // ✅ Import useRouter
 
 export default function LoginPage() {
+  const router = useRouter(); // ✅ Initialize useRouter
 
   return (
     <div className="flex min-h-screen">
@@ -45,7 +48,6 @@ export default function LoginPage() {
             <div className="flex flex-col gap-2">
               <button
                 formAction={login}
-                // legg til 'startside' navigasjon 
                 className="w-full bg-secondary hover:bg-purple-700 text-white font-medium py-3 rounded-2xl transition"
               >
                 Log in
@@ -54,8 +56,7 @@ export default function LoginPage() {
                 Don't have an account?
                 <button
                   type="button"
-                  // legg til 'signup' navigasjon
-                  formAction={signup}
+                  onClick={() => router.push("/signup")} // ✅ Navigate to Signup Page
                   className="w-full bg-white hover:bg-gray-800 font-medium py-3 rounded-2xl transition text-primary hover:text-gray"
                 >
                   Sign up
@@ -68,6 +69,6 @@ export default function LoginPage() {
 
       {/* Right Section (Purple Background) */}
       <div className="w-2/5 bg-secondary min-h-screen"></div>
-    </div>  
+    </div>
   );
 }
