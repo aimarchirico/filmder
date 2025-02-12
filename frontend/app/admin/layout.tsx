@@ -1,8 +1,6 @@
-import './globals.css'
-
 export const metadata = {
-  title: 'Filmder',
-  description: 'Filmder web app',
+  title: 'Admin',
+  description: 'Filmder Admin',
 }
 
 export default function RootLayout({
