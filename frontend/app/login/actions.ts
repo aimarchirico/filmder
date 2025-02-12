@@ -28,7 +28,7 @@ export async function login(formData: FormData) {
   if (adminCheck?.is_admin) {
     redirect('/admin')
   } else {
-    redirect('/')
+    redirect('/home')
   }
 }
 
