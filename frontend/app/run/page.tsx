@@ -1,13 +1,63 @@
-import React from 'react';
+"use client";
+
+import Link from 'next/link'
+import React, { useState } from 'react';
 import Image from 'next/image';
-import { ThumbsUp, ThumbsDown } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, Menu } from 'lucide-react';
 
 export default function HomePage() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   return (
-    <div 
-    
-        className="min-h-screen flex flex-col items-center justify-center bg-black text-white">
-      
+    <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white">
+
+{/* Hamburger Menu */}
+<div className="absolute top-4 right-4">
+        <button 
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          className="p-2 hover:bg-purple-700 rounded-lg transition"
+        >
+          <Menu className="w-12 h-12 text-white" />
+        </button>
+        
+        {/* Dropdown Menu */}
+        {isMenuOpen && (
+          <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+            <div className="py-1">
+              
+              <Link 
+                href="/profile" 
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                Profile
+              </Link>
+              
+              <Link 
+                href="/settings" 
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                Settings
+              </Link>
+              
+              <Link 
+                href="/friends" 
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                Friends
+              </Link>
+              
+              <button 
+                onClick={() => {/* Add signout logic */}} 
+                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                Sign out
+              </button>
+            
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Title */}
       <h1 className="text-4xl font-bold text-[var(--secondary-color)] mb-8">FILMDER</h1>
 
