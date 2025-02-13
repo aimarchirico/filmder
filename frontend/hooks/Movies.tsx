@@ -1,3 +1,4 @@
+import { Movie } from "@/types/Movies";
 import { createClient } from "@/utils/supabase/client";
 
 const useMovies = () => {
@@ -15,7 +16,7 @@ const useMovies = () => {
     return data;
   };
 
-  const fetchNextMovie = async (genres: number[]) => {
+  const fetchNextMovie = async (genres: number[], excludeId?: number): Promise<Movie | null> => {
     const user = await getUser();
     if (!user) return null;
 
@@ -24,12 +25,15 @@ const useMovies = () => {
       .from("user_movies")
       .select("movie_id")
       .eq("user_id", user.id);
+    const ratedMovieIds = ratedMovies?.map((rm: { movie_id: number }) => rm.movie_id) || [];
 
-    const ratedMovieIds =
-      ratedMovies?.map((rm: { movie_id: number }) => rm.movie_id) || [];
-    console.log(ratedMovieIds);
+    // exclude already rated + current movie
+    const excludeIds = [...ratedMovieIds];
+    if (excludeId && !excludeIds.includes(excludeId)) {
+      excludeIds.push(excludeId);
+    }
 
-    // supabase query
+    // build query
     let query = supabase.from("movies").select(`
       id,
       name,
@@ -38,33 +42,33 @@ const useMovies = () => {
       movie_genres!inner(genre_id)
     `);
 
-    // exclude rated movies
-    if (ratedMovieIds.length > 0) {
-      query = query.not("id", "in", `(${ratedMovieIds.join(",")})`);
+    if (excludeIds.length > 0) {
+      query = query.not("id", "in", `(${excludeIds.join(",")})`);
     }
 
-    // filter genres
     if (genres.length > 0) {
       query = query.in("movie_genres.genre_id", genres);
     }
 
     query = query.order("rating", { ascending: false }).limit(1).single();
 
-    // Get the movie
     const { data: movie, error } = await query;
-
     if (error) {
       console.error("Error fetching movie:", error);
       return null;
     }
-    return movie;
+    return {
+      id: movie.id,
+      name: movie.name,
+      image_url: movie.image_url,
+    };
   };
 
   const rateMovie = async (movieId: number, isLiked: boolean) => {
     const user = await getUser();
     if (!user || !movieId) return;
 
-    // Insert rating
+    // insert rating
     const { error } = await supabase
       .from("user_movies")
       .insert([{ user_id: user.id, movie_id: movieId, isLiked }]);
