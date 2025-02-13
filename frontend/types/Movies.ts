@@ -12,8 +12,6 @@ export interface Movie {
 
 export interface MovieCardProps {
   currentMovie: Movie | null;
-  onSwipe: (direction: string) => void;
-  onCardLeftScreen: (identifier: string) => void;
   isLoading: boolean;
 }
 
