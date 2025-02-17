@@ -1,4 +1,3 @@
-import TinderCard from "react-tinder-card";
 import React, { useEffect, useRef } from "react";
 import Image from "next/image"; 
 import { GenreDropdownProps, MovieCardProps } from "@/types/Movies"
