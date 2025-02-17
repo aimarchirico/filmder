@@ -4,6 +4,7 @@ import { createClient } from "@/utils/supabase/client";
 const useMovies = () => {
   const supabase: any = createClient();
 
+  // get logged in user
   const getUser = async () => {
     const {
       data: { user },
@@ -11,11 +12,12 @@ const useMovies = () => {
     return user;
   };
 
+  // fetch genres
   const fetchGenres = async () => {
     const { data } = await supabase.from("genres").select("*").order("name");
     return data;
   };
-
+ // fetch next movie
   const fetchNextMovie = async (genres: number[], excludeId?: number): Promise<Movie | null> => {
     const user = await getUser();
     if (!user) return null;
@@ -33,6 +35,15 @@ const useMovies = () => {
       excludeIds.push(excludeId);
     }
 
+    // if no genres are passed, use favorite genres
+    let filteredGenres = genres;
+    if (genres.length === 0) {
+      const favoriteGenres = await fetchFavoriteGenres();
+      if (favoriteGenres.length > 0) {
+        filteredGenres = favoriteGenres;
+      }
+    } 
+
     // build query
     let query = supabase.from("movies").select(`
       id,
@@ -46,8 +57,8 @@ const useMovies = () => {
       query = query.not("id", "in", `(${excludeIds.join(",")})`);
     }
 
-    if (genres.length > 0) {
-      query = query.in("movie_genres.genre_id", genres);
+    if (filteredGenres.length > 0) {
+      query = query.in("movie_genres.genre_id", filteredGenres);
     }
 
     query = query.order("rating", { ascending: false }).limit(1).single();
@@ -64,7 +75,7 @@ const useMovies = () => {
     };
   };
 
-  const rateMovie = async (movieId: number, isLiked: boolean) => {
+  const rateMovie = async (movieId: number, isLiked: boolean): Promise<void> => {
     const user = await getUser();
     if (!user || !movieId) return;
 
@@ -79,10 +90,51 @@ const useMovies = () => {
     }
   };
 
+  // fetch favorite genre ids based on liked movies
+const fetchFavoriteGenres = async (): Promise<number[]> => {
+  const user = await getUser();
+  if (!user) return [];
+
+  // fetch movies the user liked
+  const { data: likedMovies, error: likedMoviesError } = await supabase
+    .from("user_movies")
+    .select("movie_id")
+    .eq("user_id", user.id)
+    .eq("isLiked", true);
+
+  if (likedMoviesError) {
+    console.error("Error fetching liked movies:", likedMoviesError);
+    return [];
+  }
+
+  const movieIds: number[] = likedMovies.map(
+    (item: { movie_id: number }) => item.movie_id
+  );
+  if (movieIds.length === 0) return [];
+
+  // fetch genres for these movies
+  const { data: movieGenres, error: movieGenresError } = await supabase
+    .from("movie_genres")
+    .select("genre_id", { distinct: true })
+    .in("movie_id", movieIds);
+
+  if (movieGenresError) {
+    console.error("Error fetching movie genres:", movieGenresError);
+    return [];
+  }
+
+  const genreIds: number[] = movieGenres.map(
+    (mg: { genre_id: number }) => mg.genre_id
+  );
+
+  return genreIds;
+};
+
+
   return {
     fetchGenres,
     fetchNextMovie,
-    rateMovie,
+    rateMovie
   };
 };
 
