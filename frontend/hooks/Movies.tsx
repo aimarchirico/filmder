@@ -1,4 +1,4 @@
-import { Movie } from "@/types/Movies";
+import { Movie, movieBatchSize } from "@/types/Movies";
 import { createClient } from "@/utils/supabase/client";
 
 const useMovies = () => {
@@ -74,7 +74,7 @@ const fetchFavoriteGenres = async (): Promise<number[]> => {
 };
 
   // fetch multiple movies
-  const fetchMovieBatch = async (genres: number[], excludeIds: number[] = [], limit: number = 50): Promise<Movie[]> => {
+  const fetchMovieBatch = async (genres: number[], excludeIds: number[] = [], limit: number = movieBatchSize): Promise<Movie[]> => {
     const user = await getUser();
     if (!user) return [];
 
