@@ -1,16 +1,10 @@
 import { Movie, movieBatchSize } from "@/types/Movies";
 import { createClient } from "@/utils/supabase/client";
+import useUser from "@/hooks/User"
 
 const useMovies = () => {
   const supabase: any = createClient();
-
-  // get logged in user
-  const getUser = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    return user;
-  };
+  const { getUser } = useUser(supabase);
 
   // fetch genres
   const fetchGenres = async () => {
