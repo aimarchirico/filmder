@@ -28,7 +28,7 @@ export default function FriendsPage() {
       </div>
 
       {/* Home Button */}
-      <Link href="/run">
+      <Link href="/home">
         <button className="mt-10 px-6 py-3 bg-[var(--secondary-color)] text-white rounded-full shadow-md border-2 border-blue-400 hover:bg-purple-700 transition">
           Home
         </button>
