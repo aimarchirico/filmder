@@ -5,7 +5,7 @@ import TinderCard from "react-tinder-card";
 import { ThumbsUp, ThumbsDown } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import useMovies from "@/hooks/Movies";
-import { Movie, Genre } from "@/types/Movies";
+import { Movie, Genre, movieBatchSize } from "@/types/Movies";
 import { GenreDropdown, MenuDropdown, MovieCard } from "@/components/Movies";
 
 export default function HomePage() {
@@ -35,7 +35,7 @@ export default function HomePage() {
       if (reset) {
         const newMovies = await fetchMovieBatch(selectedGenres);
         setCards(newMovies);
-        setHasMoreMovies(newMovies.length === 50);
+        setHasMoreMovies(newMovies.length === movieBatchSize);
       } else {
         const excludeIds = cards.map((card) => card.id);
         const newMovies = await fetchMovieBatch(selectedGenres, excludeIds);
@@ -76,17 +76,12 @@ export default function HomePage() {
     window.location.href = "/login";
   };
 
-  const handleButtonClick = async (movieId: number, isLiked: boolean) => {
-    setSwipeDirection(isLiked ? "right" : "left");
-    await rateMovie(movieId, isLiked);
-    setSwipeDirection(null);
-    setCards((prevCards) => prevCards.filter((card) => card.id !== movieId));
+  const handleButtonClick = async (isLiked: boolean) => {
+    swiped(isLiked ? "right" : "left", cards[0].id);
   };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-start pt-16 bg-black text-white">
-      
-
       <h1 className="text-4xl font-bold text-secondary mb-4">{"FILMDER"}</h1>
 
       <GenreDropdown
@@ -98,37 +93,36 @@ export default function HomePage() {
       />
 
       <div className="relative inline-block">
-        {cards.length > 0 && (
-          <button
-            onClick={() => handleButtonClick(cards[cards.length - 1].id, false)}
-            className={`absolute sm:absolute bottom-[-9rem] sm:bottom-auto left-[3rem] sm:left-[-90px] sm:translate-x-0
+        <button
+          onClick={() => handleButtonClick(false)}
+          className={`absolute sm:absolute bottom-[-9rem] sm:bottom-auto left-[3rem] sm:left-[-90px] sm:translate-x-0
     sm:top-1/2 sm:-translate-y-1/2 p-4 rounded-lg transition shadow-md ${
-                swipeDirection === "left"
-                  ? "bg-red-600 hover:bg-red-700"
-                  : "bg-secondary hover:bg-purple-700"
-              }`}
-            disabled={isLoading}
-          >
-            <ThumbsDown className="w-10 h-10 text-white" />
-          </button>
-        )}
+      swipeDirection === "left"
+        ? "bg-red-600 hover:bg-red-700"
+        : "bg-secondary hover:bg-purple-700"
+    }`}
+          disabled={isLoading}
+        >
+          <ThumbsDown className="w-10 h-10 text-white" />
+        </button>
 
-        {cards.length > 0 && (
-          <button
-            onClick={() => handleButtonClick(cards[cards.length - 1].id, true)}
-            className={`absolute sm:absolute bottom-[-9rem] sm:bottom-auto right-[3rem] sm:right-[-90px] sm:translate-x-0
+        <button
+          onClick={() => handleButtonClick(true)}
+          className={`absolute sm:absolute bottom-[-9rem] sm:bottom-auto right-[3rem] sm:right-[-90px] sm:translate-x-0
     sm:top-1/2 sm:-translate-y-1/2 p-4 rounded-lg transition shadow-md ${
-              swipeDirection === "right"
-                ? "bg-green-600 hover:bg-green-700"
-                : "bg-secondary hover:bg-purple-700"
-            }`}
-            disabled={isLoading}
-          >
-            <ThumbsUp className="w-10 h-10 text-white" />
-          </button>
-        )}
+      swipeDirection === "right"
+        ? "bg-green-600 hover:bg-green-700"
+        : "bg-secondary hover:bg-purple-700"
+    }`}
+          disabled={isLoading}
+        >
+          <ThumbsUp className="w-10 h-10 text-white" />
+        </button>
 
-        <div className="w-64 h-96">
+        <div className="w-64 h-96 relative">
+          <div className="absolute top-0 left-0 w-full h-full">
+            <MovieCard isLoading={isLoading} />
+          </div>
           {cards.length > 0 && !isLoading ? (
             [...cards].reverse().map((movie) => (
               <TinderCard
@@ -140,18 +134,12 @@ export default function HomePage() {
                 <MovieCard currentMovie={movie} isLoading={isLoading} />
               </TinderCard>
             ))
-          ) : (
-            <div className="w-64 h-96 bg-gray-800 rounded-lg flex items-center justify-center border-2 border-secondary">
-              <p className="text-white text-lg font-medium">
-                {isLoading ? "Loading..." : "No more movies"}
-              </p>
-            </div>
-          )}
+          ) : null }
         </div>
       </div>
 
-      <MenuDropdown 
-        onSignOut={handleSignOut} 
+      <MenuDropdown
+        onSignOut={handleSignOut}
         isMenuOpen={isMenuOpen}
         setIsMenuOpen={setIsMenuOpen}
       />
