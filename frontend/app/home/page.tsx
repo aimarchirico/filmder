@@ -7,8 +7,13 @@ import { createClient } from "@/utils/supabase/client";
 import useMovies from "@/hooks/Movies";
 import { Movie, Genre, movieBatchSize } from "@/types/Movies";
 import { GenreDropdown, MenuDropdown, MovieCard } from "@/components/Movies";
+import SplashScreen from "@/components/SplashScreen";
+import useUser from "@/hooks/User";
+import { redirect } from "next/navigation";
 
 export default function HomePage() {
+  
+  const supabase = createClient();
   const [swipeDirection, setSwipeDirection] = useState<"left" | "right" | null>(
     null
   );
@@ -20,6 +25,20 @@ export default function HomePage() {
   const [cards, setCards] = useState<Movie[]>([]);
   const { fetchGenres, fetchMovieBatch, rateMovie } = useMovies();
   const [hasMoreMovies, setHasMoreMovies] = useState(true);
+const { getUser } = useUser(supabase)
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+ 
+  useEffect(() => {
+    async function checkAuth() {
+      const user = await getUser();
+      
+      if (!user) {
+        redirect('/login')
+      }
+      setIsCheckingAuth(false);
+    }
+    checkAuth();
+  }, []);
 
   useEffect(() => {
     const fetchAndSetGenres = async () => {
@@ -81,6 +100,8 @@ export default function HomePage() {
   };
 
   return (
+
+    isCheckingAuth ? <SplashScreen/> :  
     <div className="min-h-screen flex flex-col items-center justify-start pt-16 bg-black text-white">
       <h1 className="text-4xl font-bold text-secondary mb-4">{"FILMDER"}</h1>
 
