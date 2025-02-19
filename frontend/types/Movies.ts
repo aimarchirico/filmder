@@ -1,3 +1,5 @@
+export const movieBatchSize = 20 // breaks on mobile at around 25 causing glitching
+
 export interface Genre {
   id: number;
   name: string;
@@ -11,7 +13,7 @@ export interface Movie {
 }
 
 export interface MovieCardProps {
-  currentMovie: Movie | null;
+  currentMovie?: Movie ;
   isLoading: boolean;
 }
 
@@ -21,4 +23,10 @@ export interface GenreDropdownProps {
   genres: Genre[];
   selectedGenres: number[];
   setSelectedGenres: React.Dispatch<number[]>;
+}
+
+export interface MenuDropdownProps {
+  onSignOut: () => void;
+  isMenuOpen: boolean;
+  setIsMenuOpen: React.Dispatch<boolean>;
 }
