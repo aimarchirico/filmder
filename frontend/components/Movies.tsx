@@ -4,10 +4,10 @@ import { GenreDropdownProps, MenuDropdownProps, MovieCardProps } from "@/types/M
 import Link from "next/link";
 import { Menu } from "lucide-react";
 
-export const MovieCard: React.FC<MovieCardProps> = ({ currentMovie }) => {
+export const MovieCard: React.FC<MovieCardProps> = ({ currentMovie, isLoading }) => {
   return (
     <div className="w-64 h-96 cursor-pointer">
-      {currentMovie && currentMovie.image_url ? (
+      {currentMovie && currentMovie.image_url && !isLoading ? (
         <>
           {/* image container */}
           <div className="relative w-full h-full overflow-hidden rounded-lg shadow-lg border-2 border-secondary">
@@ -30,11 +30,21 @@ export const MovieCard: React.FC<MovieCardProps> = ({ currentMovie }) => {
           </div>
         </>
       ) : (
-        <div className="w-64 h-96 bg-gray-800 rounded-lg flex items-center justify-center border-2 border-secondary">
+        <>
+        <div className="relative w-full h-full overflow-hidden rounded-lg border-2 border-secondary flex items-center justify-center bg-gray-800">
           <span className="text-white text-lg font-medium">
-            No more movies
+          {isLoading ? "Loading..." : "No more movies"}
           </span>
         </div>
+        <div className="w-64 mt-4">
+            <div className="bg-secondary text-white rounded-lg shadow-md hover:bg-purple-700 transition p-2">
+              <h2 className="truncate text-center">
+                <span className="opacity-0">Placeholder</span>
+              </h2>
+            </div>
+          </div>
+        </>
+        
       )}
     </div>
   );
