@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import Movies from "./page";
+import SplashScreen from "@/components/SplashScreen";
 
 // Mock the Supabase client
 jest.mock("../utils/supabase/client", () => ({
@@ -14,17 +15,17 @@ jest.mock("../utils/supabase/client", () => ({
   })),
 }));
 
-describe("Movies component", () => {
-  it("renders 'Filmder av gruppe 28!'", async () => {
-    render(<Movies />);
+describe("Splash screen component", () => {
+  it("renders 'FILMDER'", async () => {
+    render(<SplashScreen />);
 
     // Wait for the element to appear in the DOM
-    expect(await screen.findByText("Filmder av gruppe 28!")).toBeInTheDocument();
+    expect(await screen.findByText("FILMDER")).toBeInTheDocument();
   });
 
-  it("renders 'Koblet til Supabase!'", async () => {
-    render(<Movies />);
+  it("renders 'TDT4100 Group 28'", async () => {
+    render(<SplashScreen />);
     
-    expect(await screen.findByText("Koblet til Supabase!")).toBeInTheDocument();
+    expect(await screen.findByText("TDT4140 Group 28")).toBeInTheDocument();
   });
 });
