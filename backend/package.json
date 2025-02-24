@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "deno": "^2.1.9",
-    "supabase": "^2.9.6"
+    "supabase": "^2.12.1"
   },
   "devDependencies": {
     "@testing-library/react": "^16.2.0",
