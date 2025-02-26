@@ -54,37 +54,42 @@ export default function FriendsPage() {
 
       {/* Main Container */}
       <div className="w-3/4 flex justify-between  mt-10">
-        {/* Left Section - Find Friend */}
-        <div className="w-1/2 flex flex-col">
-          <p className="text-2xl font-semibold mb-4 flex items-center justify-center">Want to link up with friends?</p>
-          <label className=" mb-2">E-mail:</label>
-          <input
-            type="text"
-            value={username}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setUsername(e.target.value)
-            }
-            className="w-128 mt-1 p-3 border-2 rounded-2xl text-white bg-gray-800 border-secondary focus:outline-none"
-          />
-          <button className="mt-4 px-6 py-2 bg-secondary rounded-2xl text-white hover:bg-secondary transition">
-            Find friend
-          </button>
+        {/* Left Section - Search for Friends */}
+        <div className="w-1/2 flex flex-col items-center">
+          <h2 className="text-2xl font-semibold mb-4">Find Friends</h2>
 
-          {/* Home Button (Aligned to Left Corner) */}
-          <div className="self-start ml-4 mt-6">
-            
-              <button 
+          <div className="p-4 w-3/4 h-128 flex flex-col">
+            <p className="text-lg font-medium mb-4 text-center">Want to link up with friends?</p>
+
+            <label className=" mb-2">E-mail:</label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
+              className="w-full p-3 border-2 border-secondary rounded-2xl text-white bg-gray-800 focus:outline-none"
+            />
+
+            <button className="mt-4 px-6 py-3 bg-secondary text-white rounded-2xl hover:bg-purple-700 transition">
+              Find friend
+            </button>
+
+            {/* Home Button (Aligned to Left Corner) */}
+            <div className="self-start mt-6">
+              <button
                 type="button"
                 onClick={() => router.push("/home")}
-                className="px-6 py-3 bg-secondary text-white rounded-full shadow-md hover:bg-purple-700 transition">
+                className="px-6 py-3 bg-secondary text-white rounded-full shadow-md hover:bg-purple-700 transition"
+              >
                 Home
               </button>
+            </div>
           </div>
         </div>
 
+
         {/* Right Section - Friend Requests */}
-        <div className="w-1/2 flex flex-col items-center">
-          <h2 className="text-2xl font-semibold mb-4 justify-center">Friend Requests</h2>
+        <div className="w-1/2 flex flex-col ">
+          <h2 className="text-2xl font-semibold mb-4 justify-center items-center">Friend Requests</h2>
 
           <div className="border-secondary border-4 rounded-2xl p-4 w-3/4 h-128 overflow-y-auto flex flex-col">
             {/* ✅ Loading Indicator */}
