@@ -88,10 +88,10 @@ export default function FriendsPage() {
 
 
         {/* Right Section - Friend Requests */}
-        <div className="w-1/2 flex flex-col ">
-          <h2 className="text-2xl font-semibold mb-4 justify-center items-center">Friend Requests</h2>
+        <div className="w-1/2 flex flex-col items-center">
+          <h2 className="text-2xl font-semibold mb-4">Friend Requests</h2>
 
-          <div className="border-secondary border-4 rounded-2xl p-4 w-3/4 h-128 overflow-y-auto flex flex-col">
+          <div className="border-secondary border-4 rounded-2xl p-4 w-3/4 h-80 overflow-y-auto flex flex-col">
             {/* ✅ Loading Indicator */}
             {friendRequests.length === 0 && <p>Loading friend requests...</p>}
 
@@ -121,6 +121,7 @@ export default function FriendsPage() {
               ))}
           </div>
         </div>
+
       </div>
     </div>
   );
