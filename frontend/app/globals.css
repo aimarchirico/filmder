@@ -7,8 +7,11 @@
 
 /* Custom global theme styles */
 :root {
-  --primary-color: #0E0E0E ; /* Example primary color */
-  --secondary-color: #7352E4 ; /* Example secondary color */
+  --primary-color: #0E0E0E ; /* Dark theme background */
+  --secondary-color: #7352E4 ; /* Purple accent */
+  --scrollbar-track: #1A1A1A; /* Darker background for scrollbar track */
+  --scrollbar-thumb: #7352E4; /* Purple scrollbar thumb */
+  --scrollbar-thumb-hover: #8b6df5; /* Lighter purple on hover */
 }
 
 body {
@@ -27,4 +30,30 @@ h1 {
 }
 .text-secondary {
   color: var(--secondary-color);
+}
+
+.scrollbar {
+  direction: ltr;
+  padding-right: 12px;
+}
+
+/* ✅ Custom Scrollbar Styles */
+.scrollbar::-webkit-scrollbar {
+  width: 8px; /* Set width */
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb); /* Purple scrollbar */
+  border-radius: 10px;
+  height: 80%;
+ 
+}
+
+.scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover); /* Lighter purple on hover */
+}
+
+/* Hide scrollbar for a cleaner look (optional) */
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
 }
