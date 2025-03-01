@@ -34,6 +34,25 @@ const fetchAndSetGenres = async (supabase: any) => {
   return data.genres
 }
 
+const fetchMovieTrailer = async (movieId: number) => {
+  const response = await fetch(
+    `https://api.themoviedb.org/3/movie/${movieId}/videos`,
+    {
+      headers: {
+        accept: "application/json",
+        Authorization: `Bearer ${Deno.env.get("TMDB_ACCESS_TOKEN")}`,
+      },
+    }
+  );
+  const data = await response.json();
+  if (!data.results) return null;
+
+  const trailer = data.results.find(
+    (video: any) => video.type === "Trailer" && video.site === "YouTube"
+  );
+  return trailer ? `https://www.youtube.com/watch?v=${trailer.key}` : null;
+};
+
 const fetchAndSetMovies = async (supabase: any) => {
   let allMovies: movieResponse[] = []
 
@@ -47,7 +66,7 @@ const fetchAndSetMovies = async (supabase: any) => {
         }
       }
     )
-      const data = await response.json()
+  const data = await response.json()
   if (!data.results) throw new Error("No results from TMDB API")
   allMovies = [...allMovies, ...data.results]
   }
@@ -55,15 +74,21 @@ const fetchAndSetMovies = async (supabase: any) => {
   const uniqueMovies = [...new Map(allMovies.reverse().map(movie => [movie.id, movie])).values()]
 
 
-  const movies = uniqueMovies.map(movie => ({
-    id: movie.id,
-    name: movie.title,
-    year: new Date(movie.release_date).getFullYear(),
-    description: movie.overview,
-    image_url: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
-    rating: movie.vote_average,
-    genre_ids: movie.genre_ids
-  }))
+  const movies = await Promise.all(
+    uniqueMovies.map(async (movie) => {
+      const trailerUrl = await fetchMovieTrailer(movie.id);
+      return {
+        id: movie.id,
+        name: movie.title,
+        year: new Date(movie.release_date).getFullYear(),
+        description: movie.overview,
+        image_url: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+        rating: movie.vote_average,
+        genre_ids: movie.genre_ids,
+        trailer_url: trailerUrl
+      };
+    })
+  );
 
   const { error } = await supabase
     .from("movies")
