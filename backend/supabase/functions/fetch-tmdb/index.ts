@@ -47,10 +47,19 @@ const fetchMovieTrailer = async (movieId: number) => {
   const data = await response.json();
   if (!data.results) return null;
 
-  const trailer = data.results.find(
-    (video: any) => video.type === "Trailer" && video.site === "YouTube"
-  );
-  return trailer ? `https://www.youtube.com/watch?v=${trailer.key}` : null;
+  const videoTypes = ["Trailer", "Teaser", "Clip", "Behind the Scenes", "Featurette"];
+  
+  for (const type of videoTypes) {
+    const video = data.results.find(
+      (video: any) => video.type === type && video.site === "YouTube"
+    );
+    
+    if (video) {
+      return `https://www.youtube.com/watch?v=${video.key}`;
+    }
+  }
+
+  return null;
 };
 
 const fetchAndSetMovies = async (supabase: any) => {
@@ -77,6 +86,7 @@ const fetchAndSetMovies = async (supabase: any) => {
   const movies = await Promise.all(
     uniqueMovies.map(async (movie) => {
       const trailerUrl = await fetchMovieTrailer(movie.id);
+      await new Promise(resolve => setTimeout(resolve, 50));
       return {
         id: movie.id,
         name: movie.title,
