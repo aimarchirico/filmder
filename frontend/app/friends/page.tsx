@@ -7,6 +7,7 @@ import useFriends from "@/hooks/Friends";
 import SplashScreen from "@/components/SplashScreen";
 import { FriendsBox, FindFriends } from "@/components/Friends";
 import { Friend, FriendRequest } from "@/types/Friends";
+import MenuDropdown from "@/components/Menu";
 
 export default function FriendsPage() {
   const router = useRouter();
@@ -251,6 +252,9 @@ export default function FriendsPage() {
           />
         </div>
       </div>
+      <MenuDropdown
+      />
     </div>
+    
   );
 }

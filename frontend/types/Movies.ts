@@ -25,8 +25,3 @@ export interface GenreDropdownProps {
   setSelectedGenres: React.Dispatch<number[]>;
 }
 
-export interface MenuDropdownProps {
-  onSignOut: () => void;
-  isMenuOpen: boolean;
-  setIsMenuOpen: React.Dispatch<boolean>;
-}
