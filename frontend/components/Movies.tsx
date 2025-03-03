@@ -4,8 +4,6 @@ import React, { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image"; 
 import { GenreDropdownProps, MovieCardProps } from "@/types/Movies"
-import Link from "next/link";
-import { Menu } from "lucide-react";
 
 export const MovieCard: React.FC<MovieCardProps> = ({ currentMovie, isLoading }) => {
   const router = useRouter();
