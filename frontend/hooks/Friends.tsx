@@ -36,9 +36,7 @@ const getFriends = async () => {
       return { error: 'User not authenticated' };
     }
 
-    const response = await supabase.functions.invoke('fetch-friends', {
-      body: { userId: user.id }
-    });
+    const response = await supabase.functions.invoke('fetch-friends');
 
     if (response.error && response.error instanceof FunctionsHttpError) {
       const errorMessage = await response.error.context.json()
