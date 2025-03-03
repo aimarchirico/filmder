@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import Image from "next/image"; 
-import { GenreDropdownProps, MenuDropdownProps, MovieCardProps } from "@/types/Movies"
+import { GenreDropdownProps, MovieCardProps } from "@/types/Movies"
 import Link from "next/link";
 import { Menu } from "lucide-react";
 
@@ -114,49 +114,5 @@ export const GenreDropdown: React.FC<GenreDropdownProps> = ({
         </div>
       )}
     </div>
-  );
-};
-
-export const MenuDropdown: React.FC<MenuDropdownProps> = ({isMenuOpen, setIsMenuOpen, onSignOut}) => {
-  return (
-    <div className="absolute top-4 right-4">
-        <button
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="p-2 hover:bg-purple-700 rounded-lg transition"
-        >
-          <Menu className="w-12 h-12 text-white" />
-        </button>
-        {isMenuOpen && (
-    <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-gray-900 ring-1 ring-secondary">
-      <div className="py-1">
-        <Link
-          href="/profile"
-          className="block px-4 py-2 text-sm text-white hover:bg-gray-800 transition-colors"
-        >
-          Profile
-        </Link>
-        <Link
-          href="/settings"
-          className="block px-4 py-2 text-sm text-white hover:bg-gray-800 transition-colors"
-        >
-          Settings
-        </Link>
-        <Link
-          href="/friends"
-          className="block px-4 py-2 text-sm text-white hover:bg-gray-800 transition-colors"
-        >
-          Friends
-        </Link>
-        <button
-          onClick={onSignOut}
-          className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-800 transition-colors"
-        >
-          Sign out
-        </button>
-      </div>
-    </div>
-    
-)}
-</div>
   );
 };
