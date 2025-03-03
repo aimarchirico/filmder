@@ -6,14 +6,14 @@ const useFriends = () => {
   const supabase: any = createClient();
   const { getUser } = useUser(supabase);
 
-  const sendFriendRequest = async (email: string) => {
+  const updateFriendRequest = async (email: string, status: string = 'pending') => {
     const user = await getUser();
     if (!user || !email) {
       return { error: 'User not authenticated or email missing' };
     }
     
     const response = await supabase.functions.invoke('add-friend', {
-      body: { email }
+      body: { email, status }
     });
 
     if (response.error && response.error instanceof FunctionsHttpError) {
@@ -30,8 +30,33 @@ const useFriends = () => {
     };
   }
 
+const getFriends = async () => {
+    const user = await getUser();
+    if (!user) {
+      return { error: 'User not authenticated' };
+    }
+
+    const response = await supabase.functions.invoke('fetch-friends', {
+      body: { userId: user.id }
+    });
+
+    if (response.error && response.error instanceof FunctionsHttpError) {
+      const errorMessage = await response.error.context.json()
+      return {
+        data: null,
+        error: errorMessage.error || 'Unknown error occurred'
+      };
+    }
+
+    return {
+      data: response.data,
+      error: response.error?.message || null
+    };
+  }
+
   return {
-    sendFriendRequest
+    updateFriendRequest,
+    getFriends,
   }
 }
 
