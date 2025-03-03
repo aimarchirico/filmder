@@ -252,8 +252,7 @@ export default function FriendsPage() {
           />
         </div>
       </div>
-      <MenuDropdown
-      />
+      <MenuDropdown/>
     </div>
     
   );
