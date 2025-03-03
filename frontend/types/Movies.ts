@@ -9,6 +9,9 @@ export interface Movie {
   id: number;
   image_url: string;
   name: string;
+  description: string;
+  year: number;
+  trailer_url: string
   key?: number;
   description?: string;
 }
@@ -26,8 +29,3 @@ export interface GenreDropdownProps {
   setSelectedGenres: React.Dispatch<number[]>;
 }
 
-export interface MenuDropdownProps {
-  onSignOut: () => void;
-  isMenuOpen: boolean;
-  setIsMenuOpen: React.Dispatch<boolean>;
-}
