@@ -6,10 +6,11 @@ import { ThumbsUp, ThumbsDown } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import useMovies from "@/hooks/Movies";
 import { Movie, Genre, movieBatchSize } from "@/types/Movies";
-import { GenreDropdown, MenuDropdown, MovieCard } from "@/components/Movies";
+import { GenreDropdown, MovieCard } from "@/components/Movies";
 import SplashScreen from "@/components/SplashScreen";
 import useUser from "@/hooks/User";
 import { redirect } from "next/navigation";
+import MenuDropdown from "@/components/Menu";
 
 export default function HomePage() {
   
@@ -89,11 +90,7 @@ const { getUser } = useUser(supabase)
     }
   };
 
-  const handleSignOut = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    window.location.href = "/login";
-  };
+
 
   const handleButtonClick = async (isLiked: boolean) => {
     swiped(isLiked ? "right" : "left", cards[0].id);
@@ -160,9 +157,6 @@ const { getUser } = useUser(supabase)
       </div>
 
       <MenuDropdown
-        onSignOut={handleSignOut}
-        isMenuOpen={isMenuOpen}
-        setIsMenuOpen={setIsMenuOpen}
       />
     </div>
   );
