@@ -6,7 +6,7 @@ import { Menu, X } from 'lucide-react';
 import useMovies from '@/hooks/Movies';
 import useUser from '@/hooks/User';
 import { createClient } from "@/utils/supabase/client";
-import {MenuDropdown } from "@/components/Movies";
+import MenuDropdown from "@/components/Menu";
 
 export default function MoviesPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -71,25 +71,7 @@ export default function MoviesPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white">
       {/* Hamburger Menu */}
-      <div className="absolute top-4 right-4">
-        <button 
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="p-2 hover:bg-purple-700 rounded-lg transition"
-        >
-          <Menu className="w-12 h-12 text-white" />
-        </button>
-
-        {/* Dropdown Menu */}
-        {isMenuOpen && (
-          <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-gray-900 ring-1 ring-secondary p-2 z-50">
-          <div className="py-1 space-y-1">
-            <Link href="/home" className="block px-4 py-2 text-sm text-white hover:bg-gray-800 rounded-lg transition">Home</Link>
-            <Link href="/profile" className="block px-4 py-2 text-sm text-white hover:bg-gray-800 rounded-lg transition">Profile</Link>
-            <Link href="/friends" className="block px-4 py-2 text-sm text-white hover:bg-gray-800 rounded-lg transition">Friends</Link>
-            </div>
-          </div>
-        )}
-      </div>
+      <MenuDropdown/>
       
 
       {/* Title */}
