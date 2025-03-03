@@ -10,6 +10,7 @@ export interface Movie {
   image_url: string;
   name: string;
   key?: number;
+  description?: string;
 }
 
 export interface MovieCardProps {

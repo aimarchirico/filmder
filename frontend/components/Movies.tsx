@@ -1,16 +1,28 @@
+"use client"
+
 import React, { useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image"; 
 import { GenreDropdownProps, MenuDropdownProps, MovieCardProps } from "@/types/Movies"
 import Link from "next/link";
 import { Menu } from "lucide-react";
 
 export const MovieCard: React.FC<MovieCardProps> = ({ currentMovie, isLoading }) => {
+  const router = useRouter();
+
+  const handleNavigation = () => {
+    if (currentMovie) {
+      router.push(`/home/info/${currentMovie.id}`); // ✅ Navigate to movie details page
+    }
+  };
+
   return (
     <div className="w-64 h-96 cursor-pointer">
       {currentMovie && currentMovie.image_url && !isLoading ? (
         <>
           {/* image container */}
-          <div className="relative w-full h-full overflow-hidden rounded-lg shadow-lg border-2 border-secondary">
+          <div className="relative w-full h-full overflow-hidden rounded-lg shadow-lg border-2 border-secondary"
+            onClick={handleNavigation}>
             <Image
               src={currentMovie.image_url}
               alt="Movie Poster"
@@ -20,13 +32,14 @@ export const MovieCard: React.FC<MovieCardProps> = ({ currentMovie, isLoading })
               draggable={false}
             />
           </div>
-          {/* movie title below image */}
+          {/* Clickable Movie Title */}
           <div className="w-64 mt-4">
-            <div className="bg-secondary text-white rounded-lg shadow-md hover:bg-purple-700 transition p-2">
-              <h2 className="truncate text-center">
-                {currentMovie.name}
-              </h2>
-            </div>
+            <button
+              className="bg-secondary text-white rounded-lg shadow-md hover:bg-purple-700 transition p-2 w-full"
+              onClick={handleNavigation} // ✅ Navigate on click
+            >
+              <h2 className="truncate text-center">{currentMovie.name}</h2>
+            </button>
           </div>
         </>
       ) : (
@@ -46,6 +59,8 @@ export const MovieCard: React.FC<MovieCardProps> = ({ currentMovie, isLoading })
         </>
         
       )}
+
+      
     </div>
   );
 };
