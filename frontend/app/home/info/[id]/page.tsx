@@ -5,13 +5,14 @@ import { useEffect, useState, use } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { Movie } from "@/types/Movies";
 import React from "react";
-import ReactPlayer from "react-player"; // ✅ Correct import
+import ReactPlayer from "react-player";
+import MenuDropdown from "@/components/Menu";
 
 export default function MovieInfoPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const supabase = createClient();
   
-  // ✅ Use `use()` to unwrap params
+  // Unwrap the params
   const { id } = use(params);
 
   const [movie, setMovie] = useState<Movie | null>(null);
@@ -49,36 +50,40 @@ export default function MovieInfoPage({ params }: { params: Promise<{ id: string
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start pt-16 bg-black text-white">
-      {/* ✅ Video Player */}
-      <ReactPlayer
-        url={movie.trailer_url} // ✅ Use actual video link
-        controls
-        width="100%"
-        height="400px"
+    
+    <div className="min-h-screen flex flex-col items-center justify-start pt-10 bg-black text-white px-6">
+      <MenuDropdown
       />
-
-      <h1 className="text-4xl font-bold text-secondary mb-4">{movie.name}</h1>
-
-      <div className="flex flex-row justify-center items-center gap-4 w-full mt-4">
-        {/* Left Column (Rating) */}
-        <div className="w-1/2 bg-gray-800 p-4 rounded-lg shadow-md">
-          <h2 className="text-lg font-semibold text-white">Rating: {movie.rating || "N/A"}</h2>
-        </div>
-
-        {/* Right Column (Other Info) */}
-        <div className="w-1/2 bg-gray-800 p-4 rounded-lg shadow-md">
-          <h2 className="text-lg font-semibold text-white">More Info...</h2>
-        </div>
+      {/* Video Player */}
+      <div className="w-full max-w-2xl mb-6">
+        <ReactPlayer
+          url={movie.trailer_url}
+          controls
+          width="100%"
+          height="360px"
+          playing={true}
+          loop={true}
+        />
       </div>
 
-      <p className="text-gray-300 text-center mt-4 max-w-2xl">{movie.description || "No description available."}</p>
+      {/* Movie Title */}
+      <h1 className="text-4xl font-bold text-white text-center mb-2">{movie.name}</h1>
+      <p className="text-gray-400 text-lg text-center mb-4">
+        <span className="mr-4">Utgivelsesår: {movie.year || "N/A"}</span>
+        <span>Rating: {movie.rating ? movie.rating.toFixed(1) : "N/A"}/10</span>
+      </p>
 
+      {/* Movie Description */}
+      <p className="text-gray-300 text-center max-w-2xl leading-relaxed mb-6">
+        {movie.description || "No description available."}
+      </p>
+
+      {/* Back Button */}
       <button
-        className="mt-6 px-4 py-2 bg-secondary text-white w-48 rounded-2xl shadow-md hover:bg-purple-700 transition"
+        className="px-6 py-3 bg-purple-600 text-white rounded-2xl w-48 shadow-lg hover:bg-purple-700 transition"
         onClick={() => router.back()}
       >
-        Go Back
+        Back
       </button>
     </div>
   );
