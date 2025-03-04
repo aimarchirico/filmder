@@ -13,6 +13,7 @@ export interface Movie {
   year: number;
   trailer_url: string
   key?: number;
+  rating: number;
 }
 
 export interface MovieCardProps {
