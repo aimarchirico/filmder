@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import useFriends from "@/hooks/Friends";
 import { Friend, FriendRequest } from "@/types/Friends";
+import useMovies from "@/hooks/Movies";
+import { Genre } from "@/types/Movies";
 
 export default function CreateMovieNight() {
   const router = useRouter();
@@ -12,20 +14,21 @@ export default function CreateMovieNight() {
   const [movieNightName, setMovieNightName] = useState("");
   const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
   const [movieCount, setMovieCount] = useState("");
-    const [isLoading, setIsLoading] = useState(true);
-      const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [isGenreDropdownOpen, setIsGenreDropdownOpen] = useState(false);
   const [friendsList, setFriendsList] = useState<Friend[]>([]);
+  const { fetchGenres, fetchMovieBatch, rateMovie } = useMovies();
+  const [genres, setGenres] = useState<Genre[]>([]);
 
-  // Mock data for frontend development
-  const mockGenres = [
-    { id: 1, name: "Action" },
-    { id: 2, name: "Comedy" },
-    { id: 3, name: "Drama" },
-    { id: 4, name: "Horror" },
-    { id: 5, name: "Sci-Fi" }
-  ];
+  useEffect(() => {
+      const fetchAndSetGenres = async () => {
+        const data = await fetchGenres();
+        if (data) setGenres(data);
+      };
+      fetchAndSetGenres();
+    }, []);
 
   useEffect(() => {
     async function fetchFriends() {
@@ -123,7 +126,7 @@ export default function CreateMovieNight() {
               
               {isGenreDropdownOpen && (
                 <div className="absolute z-10 w-full mt-2 bg-gray-800 border-2 border-secondary rounded-2xl">
-                  {mockGenres.map((genre) => (
+                  {genres.map((genre) => (
                     <button
                       key={genre.id}
                       type="button"
@@ -156,7 +159,7 @@ export default function CreateMovieNight() {
             >
               <option value="">Select friends</option>
               {friendsList.map((friend) => (
-                <option key={friend.id} value={friend.id}>
+                <option key={friend.id} value={friend.email}>
                   {friend.email}
                 </option>
               ))}
