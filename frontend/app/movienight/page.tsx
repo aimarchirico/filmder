@@ -2,15 +2,21 @@
 
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
-
+import useFriends from "@/hooks/Friends";
+import { Friend, FriendRequest } from "@/types/Friends";
 
 export default function CreateMovieNight() {
   const router = useRouter();
+  const { getFriends, updateFriendRequest } = useFriends();
+
   const [movieNightName, setMovieNightName] = useState("");
   const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
   const [movieCount, setMovieCount] = useState("");
+    const [isLoading, setIsLoading] = useState(true);
+      const [error, setError] = useState<string | null>(null);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [isGenreDropdownOpen, setIsGenreDropdownOpen] = useState(false);
+  const [friendsList, setFriendsList] = useState<Friend[]>([]);
 
   // Mock data for frontend development
   const mockGenres = [
@@ -21,9 +27,44 @@ export default function CreateMovieNight() {
     { id: 5, name: "Sci-Fi" }
   ];
 
+  useEffect(() => {
+    async function fetchFriends() {
+      try {
+        setIsLoading(true);
+        const { data, error } = await getFriends();
+
+        if (error) {
+          console.error("Error fetching friends data:", error);
+          setError("Failed to load friends data");
+          return;
+        }
+
+        if (data) {
+          // Extract accepted friends
+          if (data.accepted && Array.isArray(data.accepted)) {
+            const acceptedFriends = data.accepted.map(
+              (email: string, index: number) => ({
+                id: `friend-${index}`,
+                email: email,
+              })
+            );
+            setFriendsList(acceptedFriends);
+          }
+        }
+      } catch (err) {
+        console.error("Exception fetching friends data:", err);
+        setError("An unexpected error occurred");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchFriends();
+  }, []);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Just log the form data for now
     console.log({
       movieNightName,
@@ -31,7 +72,7 @@ export default function CreateMovieNight() {
       movieCount,
       selectedGenres
     });
-    
+
     // Navigate to home page after submission
     router.push('/home');
   };
@@ -114,9 +155,11 @@ export default function CreateMovieNight() {
               onChange={(e) => setSelectedFriends([...selectedFriends, e.target.value])}
             >
               <option value="">Select friends</option>
-              <option value="friend1">Friend 1</option>
-              <option value="friend2">Friend 2</option>
-              <option value="friend3">Friend 3</option>
+              {friendsList.map((friend) => (
+                <option key={friend.id} value={friend.id}>
+                  {friend.email}
+                </option>
+              ))}
             </select>
           </div>
 

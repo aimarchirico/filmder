@@ -143,6 +143,7 @@ serve(async (req) => {
     );
 
   } catch (error) {
+    console.error('Error fetching friends:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
