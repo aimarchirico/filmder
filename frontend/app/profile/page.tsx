@@ -15,27 +15,33 @@ export default function ProfilePage() {
 
   useEffect(() => {
     async function fetchUser() {
-      const { data, error } = await supabase.auth.getUser();
-      if (error || !data.user) {
-        console.error("Error fetching user:", error);
-        router.push("/login");
-      } else {
+      try {
+        const { data, error } = await supabase.auth.getUser();
+        if (error || !data.user) {
+          console.error("Error fetching user:", error);
+          router.push("/login");
+          return;
+        }
         console.log("User metadata:", data.user.user_metadata);
         setUser(data.user);
         setFullName(data.user.user_metadata?.fullName || "Unknown User");
+      } catch (err) {
+        console.error("Unexpected error:", err);
+        router.push("/login");
       }
       setLoading(false);
     }
-
+  
     fetchUser();
   }, []);
+  
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center text-white">Loading...</div>;
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-black text-white px-6 py-10 w-full">
+    <div className="min-h-screen flex flex-col bg-black text-white px-6 py-10 mx-auto max-w-lg">
       <MenuDropdown />
 
       <h1 className="flex text-4xl font-bold text-secondary items-center justify-center mt-4">
@@ -64,7 +70,7 @@ export default function ProfilePage() {
         )}
 
         <button
-          className="mt-10 px-6 py-2 bg-secondary text-white rounded-2xl shadow-md bg-secondary hover:bg-purple-700 transition"
+          className="mt-10 px-6 py-2 bg-secondary text-white rounded-2xl shadow-md hover:bg-purple-700 transition"
           onClick={async () => {
             await supabase.auth.signOut();
             router.push("/login");
