@@ -6,9 +6,9 @@ export default function LoginPage() {
   const router = useRouter(); // Initialize useRouter
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen flex-col md:flex-row items-center justify-center md:justify-start">
       {/* Left Section (Login Form) */}
-      <div className="flex w-2/3 items-center justify-center p-6 bg-primary">
+      <div className="flex md:w-2/3 w-full items-center justify-center p-6 bg-primary">
         <div className="w-full max-w-md shadow-lg rounded-2xl p-8 border-4 border-secondary">
           <h2 className="text-2xl font-semibold text-center text-white mb-6">
             Welcome Back!
@@ -67,8 +67,8 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Right Section (Purple Background) */}
-      <div className="w-2/5 bg-secondary min-h-screen"></div>
+      {/* Right Section (Purple Background) - Hidden on Small Screens */}
+      <div className="hidden md:block w-2/5 bg-secondary min-h-screen"></div>
     </div>
   );
 }
