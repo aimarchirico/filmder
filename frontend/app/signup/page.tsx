@@ -18,17 +18,16 @@ export default function SignupPage() {
     if (result?.error) {
       setError(result.error);
     } else {
-      setSuccess(result.success ?? null); // ✅ Ensures success is always a string or null
-      setTimeout(() => router.push("/login"), 3000); // Redirect after 3s
+      setSuccess(result.success ?? null);
+      setTimeout(() => router.push("/login"), 3000);
     }
   }
 
   return (
-    <div className="flex min-h-screen bg-secondary">
-        <div className="flext w-1/2"/>
-      {/* Signup Form */}
-      <div className="flex w-1/2 items-center justify-center p-6">
-        <div className="w-full max-w-md p-8 border-4 rounded-2xl border-black">
+    <div className="flex min-h-screen bg-secondary justify-center md:justify-end px-4">
+      {/* Signup Form - Centered on Mobile, Right-Aligned on Laptop */}
+      <div className="flex w-full md:w-1/2 lg:w-2/3 items-center justify-center md:justify-end p-4">
+        <div className="w-full max-w-md p-8 lg:border-4 lg:rounded-2xl lg:border-black bg-secondary lg:shadow-lg">
           <h2 className="text-2xl font-semibold text-center text-white mb-6">Create an Account</h2>
 
           {/* Show Success or Error Messages */}
