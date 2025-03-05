@@ -174,16 +174,10 @@ export default function FriendsPage() {
         )}
       </div>
 
-      {/* Home Button */}
-      <div className=" flex justify-center mt-4">
-        <button
-          type="button"
-          onClick={() => router.push("/home")}
-          className="text-4xl font-bold text-secondary"
-        >
-          FILMDER
-        </button>
-      </div>
+      
+      <h1 className="flex text-4xl font-bold text-secondary items-center justify-center mt-4">
+        FRIENDS
+      </h1>
 
       {/* Main Container: Left (Friends List) & Right (Requests + Find Friends) */}
       <div className="w-3/4 flex flex-col md:flex-row justify-between mt-5">
