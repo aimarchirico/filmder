@@ -1,9 +1,9 @@
 "use server";
 
-import { createClient } from "@/utils/supabase/server"; // ✅ Use your existing server client
+import { createClient } from "@/utils/supabase/server";
 
 export async function signup(formData: FormData) {
-  const supabase = await createClient(); // ✅ Use your existing function
+  const supabase = await createClient();
 
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
@@ -17,12 +17,14 @@ export async function signup(formData: FormData) {
     email,
     password,
     options: {
-      data: { fullName },
+      data: {
+        full_name: fullName, // ✅ Store full name in metadata
+      },
     },
   });
 
   if (error) {
-    return { error: error.message, success: null }; // ✅ Always return an object
+    return { error: error.message, success: null };
   }
 
   return { error: null, success: "Signup successful! Please check your email." };
