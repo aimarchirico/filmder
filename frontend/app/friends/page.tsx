@@ -158,7 +158,7 @@ export default function FriendsPage() {
     return <SplashScreen />;
 
   return (
-    <div className="bg-black min-h-screen flex flex-col items-center text-white">
+    <div className="bg-black min-h-screen flex flex-col items-center text-white px-6 py-10 min-w-full">
       {/* Fixed position messages at the top */}
       <div className="fixed top-4 z-50 flex flex-col items-center w-full">
         {error && (
@@ -175,7 +175,7 @@ export default function FriendsPage() {
       </div>
 
       {/* Home Button */}
-      <div className="ml-10 mt-10 self-start">
+      <div className=" flex justify-center mt-4">
         <button
           type="button"
           onClick={() => router.push("/home")}
