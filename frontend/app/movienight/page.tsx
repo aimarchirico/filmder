@@ -22,6 +22,7 @@ export default function CreateMovieNight() {
   const { fetchGenres, fetchMovieBatch, rateMovie } = useMovies();
   const [genres, setGenres] = useState<Genre[]>([]);
 
+  // Fetches genres from the API and sets them
   useEffect(() => {
       const fetchAndSetGenres = async () => {
         const data = await fetchGenres();
@@ -30,6 +31,7 @@ export default function CreateMovieNight() {
       fetchAndSetGenres();
     }, []);
 
+  // Fetches the current users friends list from the API and sets them
   useEffect(() => {
     async function fetchFriends() {
       try {
@@ -65,6 +67,7 @@ export default function CreateMovieNight() {
     fetchFriends();
   }, []);
 
+  // Handles form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
