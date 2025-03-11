@@ -41,3 +41,11 @@ export interface GenreDropdownProps {
   setSelectedGenres: React.Dispatch<number[]>;
 }
 
+export interface FetchMovieOptions {
+  genres?: number[];
+  excludeIds?: number[];
+  limit?: number;
+  useFavoriteGenres?: boolean;
+  searchTerm?: string;
+  includeRated?: boolean; 
+}
