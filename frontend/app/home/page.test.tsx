@@ -1,126 +1,179 @@
-import { render, screen, waitFor, act } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import React from 'react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import HomePage from './page';
-import useMovies from '../../hooks/Movies';
-import useUser from '../../hooks/User';
-import { createClient } from '../../utils/supabase/client';
-import { Movie } from '../../types/Movies';
 
-// Mock hooks and components used by HomePage
-jest.mock('../../hooks/Movies');
-jest.mock('../../hooks/User');
-jest.mock('../../components/SplashScreen', () => {
-  return jest.fn(() => <div data-testid="splash-screen">Loading...</div>);
-});
-jest.mock('../../utils/supabase/client');
+// Mock dependencies
+jest.mock('@/utils/supabase/client', () => ({
+  createClient: jest.fn(() => ({})),
+}));
+
 jest.mock('next/navigation', () => ({
   redirect: jest.fn(),
 }));
+
+jest.mock('@/hooks/User', () => ({
+  __esModule: true,
+  default: () => ({
+    getUser: jest.fn().mockResolvedValue({ id: 'user123' }), // Default to authenticated user
+  }),
+}));
+
+const mockMovies = [
+  { id: 1, key: '1', title: 'Test Movie 1', poster_path: '/path1.jpg', overview: 'Overview 1' },
+  { id: 2, key: '2', title: 'Test Movie 2', poster_path: '/path2.jpg', overview: 'Overview 2' },
+];
+
+const mockGenres = [
+  { id: 1, name: 'Action' },
+  { id: 2, name: 'Comedy' },
+];
+
+jest.mock('@/hooks/Movies', () => ({
+  __esModule: true,
+  default: () => ({
+    fetchGenres: jest.fn().mockResolvedValue(mockGenres),
+    fetchMovieBatchLegacy: jest.fn().mockResolvedValue(mockMovies),
+    rateMovie: jest.fn().mockResolvedValue({}),
+  }),
+}));
+
 jest.mock('react-tinder-card', () => {
-  return jest.fn(({ children }) => <div data-testid="tinder-card">{children}</div>);
+  return {
+    __esModule: true,
+    default: ({ children, onSwipe }: { children: React.ReactNode, onSwipe?: (direction: string) => void }) => (
+      <div data-testid="tinder-card" onClick={() => onSwipe && onSwipe('right')}>
+        {children}
+      </div>
+    ),
+  };
 });
 
-describe('HomePage', () => {
-  const mockMovies: Movie[] = [
-    {
-      id: 1,
-      name: 'Test Movie 1',
-      image_url: '/test1.jpg',
-      key: 1,
-    },
-    {
-      id: 2,
-      name: 'Test Movie 2',
-      image_url: '/test2.jpg',
-      key: 2,
-    },
-  ];
+jest.mock('@/components/Movies', () => ({
+  GenreDropdown: ({ isGenreDropdownOpen, setIsGenreDropdownOpen, genres }: { 
+    isGenreDropdownOpen: boolean; 
+    setIsGenreDropdownOpen: (isOpen: boolean) => void; 
+    genres: Array<{ id: number; name: string }> 
+  }) => (
+    <div data-testid="genre-dropdown">
+      <button 
+        data-testid="toggle-dropdown" 
+        onClick={() => setIsGenreDropdownOpen(!isGenreDropdownOpen)}
+      >
+        Toggle
+      </button>
+      {isGenreDropdownOpen && 
+        <ul>
+          {genres.map(genre => (
+            <li key={genre.id} data-testid={`genre-${genre.id}`}>{genre.name}</li>
+          ))}
+        </ul>
+      }
+    </div>
+  ),
+  MovieCard: ({ currentMovie, isLoading }: { 
+    currentMovie?: { id: number; title: string; poster_path: string; overview: string };
+    isLoading: boolean;
+  }) => (
+    <div data-testid="movie-card">
+      {isLoading ? 'Loading...' : currentMovie?.title || 'No Movie'}
+    </div>
+  ),
+}));
 
-  // Setup mock implementations before each test
+jest.mock('@/components/SplashScreen', () => ({
+  __esModule: true,
+  default: () => <div data-testid="splash-screen">Loading...</div>,
+}));
+
+jest.mock('@/components/PageContainer', () => ({
+  __esModule: true,
+  default: ({ children, title }: { children: React.ReactNode; title?: string }) => (
+    <div data-testid="page-container" data-title={title}>
+      {children}
+    </div>
+  ),
+}));
+
+// Helper function for async rendering
+const renderWithAct = async (component: any) => {
+  let result;
+  await act(async () => {
+    result = render(component);
+  });
+  return result;
+};
+
+describe('HomePage Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    
-    // Mock async functions to resolve immediately
-    (useMovies as jest.Mock).mockReturnValue({
-      fetchGenres: jest.fn().mockResolvedValue([
-        { id: 28, name: 'Action' },
-        { id: 12, name: 'Adventure' }
-      ]),
-      fetchMovieBatch: jest.fn().mockResolvedValue(mockMovies),
-      rateMovie: jest.fn().mockResolvedValue({}),
-    });
-    
-    (useUser as jest.Mock).mockReturnValue({
-      getUser: jest.fn().mockResolvedValue({ id: 'user-id' }),
-    });
-    
-    (createClient as jest.Mock).mockReturnValue({
-      auth: {
-        signOut: jest.fn().mockResolvedValue({}),
-      },
-    });
   });
 
-  it('renders splash screen while checking auth', async () => {
-    // Make sure getUser returns a pending promise initially
-    const getUserMock = jest.fn().mockReturnValue(new Promise(resolve => {
-      // Never resolve this promise during the test
-      // This will keep the component in the loading state
-    }));
-    
-    (useUser as jest.Mock).mockReturnValue({
-      getUser: getUserMock,
-    });
-    
+  it('should render splash screen during authentication check', async () => {
     render(<HomePage />);
-    
-    // Now the splash screen should be visible
-    await waitFor(() => {
-      expect(screen.getByTestId('splash-screen')).toBeInTheDocument();
-    });
-  });
-/* commented out because of error in pipeline
-  it('renders movie cards after loading', async () => {
-    await act(async () => {
-      render(<HomePage />);
-    });
-    
-    // Verify the movie cards are rendered
-    await waitFor(() => {
-      const cards = screen.getAllByTestId('tinder-card');
-      expect(cards.length).toBe(mockMovies.length);
-    });
-    
-    // Check for movie titles
-    expect(screen.getByText('Test Movie 1')).toBeInTheDocument();
-    expect(screen.getByText('Test Movie 2')).toBeInTheDocument();
+    expect(screen.getByTestId('splash-screen')).toBeInTheDocument();
   });
 
-  it('displays genre filter button', async () => {
-    await act(async () => {
-      render(<HomePage />);
-    });
-    
-    // Check for the genre filter button
+  it('should render main content after authentication', async () => {
+    await renderWithAct(<HomePage />);
     await waitFor(() => {
-      const filterButton = screen.getByText(/Filter by genres/i);
-      expect(filterButton).toBeInTheDocument();
+      expect(screen.getByTestId('page-container')).toBeInTheDocument();
+      expect(screen.getByTestId('page-container')).toHaveAttribute('data-title', 'FILMDER');
     });
   });
 
-  it('fetches movies on initial load', async () => {
-    await act(async () => {
-      render(<HomePage />);
-    });
-    
-    const { fetchMovieBatch } = useMovies();
+  it('should display genre dropdown', async () => {
+    await renderWithAct(<HomePage />);
     await waitFor(() => {
-      expect(fetchMovieBatch).toHaveBeenCalledTimes(1);
+      expect(screen.getByTestId('genre-dropdown')).toBeInTheDocument();
     });
-  
-
-    // Check that the function was called with empty genres array (default)
-    expect(fetchMovieBatch).toHaveBeenCalledWith([]);
   });
-  */
+
+  it('should toggle genre dropdown when clicked', async () => {
+    await renderWithAct(<HomePage />);
+    
+    const toggleButton = await screen.findByTestId('toggle-dropdown');
+    fireEvent.click(toggleButton);
+    
+    await waitFor(() => {
+      expect(screen.getByTestId('genre-1')).toBeInTheDocument();
+      expect(screen.getByTestId('genre-2')).toBeInTheDocument();
+    });
+  });
+
+  it('should render movie cards when movies are loaded', async () => {
+    await renderWithAct(<HomePage />);
+    
+    await waitFor(() => {
+      const movieCards = screen.getAllByTestId('tinder-card');
+      expect(movieCards.length).toBeGreaterThan(0);
+    });
+  });
+
+  it('should have like and dislike buttons', async () => {
+    await renderWithAct(<HomePage />);
+    
+    await waitFor(() => {
+      expect(screen.getByTestId('page-container')).toBeInTheDocument();
+      const buttons = screen.getAllByRole('button');
+      // Two buttons: one for like, one for dislike, and one for genre dropdown toggle
+      expect(buttons.length).toBeGreaterThanOrEqual(3);
+    });
+  });
+
+  // This test verifies the keyboard handler is added
+  it('should handle keyboard events', async () => {
+    const addEventListenerSpy = jest.spyOn(window, 'addEventListener');
+    const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
+    
+    await renderWithAct(<HomePage />);
+    
+    expect(addEventListenerSpy).toHaveBeenCalledWith('keydown', expect.any(Function));
+    
+
+    
+    expect(removeEventListenerSpy).toHaveBeenCalledWith('keydown', expect.any(Function));
+    
+    addEventListenerSpy.mockRestore();
+    removeEventListenerSpy.mockRestore();
+  });
 });

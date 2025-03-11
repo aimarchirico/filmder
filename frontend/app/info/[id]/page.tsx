@@ -91,7 +91,7 @@ export default function MovieInfoPage({ params }: { params: Promise<{ id: string
         <div className="w-full max-w-2xl mx-auto">
           <h1 className="text-4xl font-bold text-white text-center mb-2">{movie.name}</h1>
           <p className="text-gray-400 text-lg text-center mb-4">
-            <span className="mr-4">Release year: {movie.year || "N/A"}</span>
+            <span className="mr-4">Released: {movie.year || "N/A"}</span>
             <span>Rating: {movie.rating ? movie.rating.toFixed(1) : "N/A"}/10</span>
           </p>
 
