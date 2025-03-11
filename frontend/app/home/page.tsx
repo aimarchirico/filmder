@@ -188,13 +188,6 @@ const { getUser } = useUser(supabase)
       
         <div className="relative w-full max-w-md mx-auto flex justify-center items-center mb-20">
         </div>
-        
-         {cards.length === 0 && !isLoading && !hasMoreMovies && (
-          <div className="text-center text-white mt-4">
-            <p className="text-xl">No more movies to show right now.</p>
-            <p className="text-sm mt-2">Try selecting different genres or check back later!</p>
-          </div>
-        )}
       </div>
     </PageContainer>
   );

@@ -10,7 +10,8 @@ import PageContainer from "@/components/PageContainer";
 export default function MoviesPage() {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
-  const { fetchLikedMovies, rateMovie } = useMovies();
+  const { fetchLikedMovies, getUserMovieRatings } = useMovies();
+  const [movieRatings, setMovieRatings] = useState<{[key: number]: string}>({});
 
   useEffect(() => {
     const loadMovies = async () => {
@@ -18,6 +19,12 @@ export default function MoviesPage() {
         setLoading(true);
         const fetchedMovies = await fetchLikedMovies();
         setMovies(fetchedMovies);
+        
+        if (fetchedMovies.length > 0) {
+          const movieIds = fetchedMovies.map(movie => movie.id);
+          const ratings = await getUserMovieRatings(movieIds);
+          setMovieRatings(ratings);
+        }
       } catch (error) {
         console.error("Error fetching liked movies:", error);
       } finally {
@@ -28,13 +35,15 @@ export default function MoviesPage() {
     loadMovies();
   }, []);
 
-  const handleDislikeMovie = async (movieId: number | string) => {
-    try {
-      await rateMovie(Number(movieId), false);
-      setMovies(prevMovies => prevMovies.filter(movie => movie.id !== Number(movieId)));
-    } catch (error) {
-      console.error("Error disliking movie:", error);
-    }
+  const handleRatingChange = (movieId: number | string, rating: string) => {
+    setMovieRatings(prev => ({
+      ...prev,
+      [Number(movieId)]: rating
+    }));
+  };
+  
+  const handleRemoveMovie = (movieId: number | string) => {
+    setMovies(prevMovies => prevMovies.filter(movie => movie.id !== Number(movieId)));
   };
 
   if (loading) {
@@ -49,9 +58,10 @@ export default function MoviesPage() {
             <SmallMovieCard 
               movie={movie}
               showControls={true}
-              showLikeDislike={false} 
-              removeOnAction={true} 
-              onDislike={(movieId) => handleDislikeMovie(movieId)}
+              showLikeDislike={true}
+              onRatingChange={handleRatingChange}
+              onRemove={handleRemoveMovie}
+              userRating={movieRatings[movie.id] || 'like'} // Default to 'like'
               className="w-full h-48 sm:h-56 md:h-64 max-w-[160px] md:max-w-[180px] lg:max-w-[200px]"
             />
           </div>

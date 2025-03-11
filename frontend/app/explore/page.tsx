@@ -13,7 +13,7 @@ export default function ExplorePage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-  const { fetchMovieBatch, fetchGenres, rateMovie, getUserMovieRating } = useMovies();
+  const { fetchMovieBatch, fetchGenres, getUserMovieRatings } = useMovies();
   const [genres, setGenres] = useState<{id: number, name: string}[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
   const [movieRatings, setMovieRatings] = useState<{[key: number]: string}>({});
@@ -45,21 +45,19 @@ export default function ExplorePage() {
         const fetchedMovies = await fetchMovieBatch({
           searchTerm: debouncedSearchTerm,
           genres: selectedGenres,
-          limit: 20,
+          limit: 100,
           useFavoriteGenres: false,
-          includeRated: true
+          // Only include rated movies when search filter is being used
+          includeRated: debouncedSearchTerm.length > 0
         });
         setMovies(fetchedMovies);
         
-        // Get ratings for fetched movies
-        const ratings: {[key: number]: string} = {};
-        for (const movie of fetchedMovies) {
-          const rating = await getUserMovieRating(movie.id);
-          if (rating) {
-            ratings[movie.id] = rating;
-          }
+        // Get ratings for all fetched movies 
+        if (fetchedMovies.length > 0) {
+          const movieIds = fetchedMovies.map(movie => movie.id);
+          const ratings = await getUserMovieRatings(movieIds);
+          setMovieRatings(ratings);
         }
-        setMovieRatings(ratings);
       } catch (error) {
         console.error("Error searching movies:", error);
       } finally {
@@ -79,17 +77,12 @@ export default function ExplorePage() {
     );
   };
 
-  const handleRateMovie = async (movieId: number | string, rating: 'like' | 'dislike') => {
-    try {
-      await rateMovie(Number(movieId), rating === 'like');
-      
-      setMovieRatings(prev => ({
-        ...prev,
-        [Number(movieId)]: rating
-      }));
-    } catch (error) {
-      console.error(`Error ${rating === 'like' ? 'liking' : 'disliking'} movie:`, error);
-    }
+  // Handle rating changes from SmallMovieCard components
+  const handleRatingChange = (movieId: number | string, rating: string) => {
+    setMovieRatings(prev => ({
+      ...prev,
+      [Number(movieId)]: rating
+    }));
   };
 
   if (loading && movies.length === 0) {
@@ -140,10 +133,7 @@ export default function ExplorePage() {
             <SmallMovieCard 
               movie={movie}
               showControls={true}
-              showLikeDislike={true}
-              removeOnAction={false}
-              onLike={(movieId) => handleRateMovie(movieId, 'like')}
-              onDislike={(movieId) => handleRateMovie(movieId, 'dislike')}
+              onRatingChange={handleRatingChange}
               userRating={movieRatings[movie.id] || null}
               className="w-full h-48 sm:h-56 md:h-64 max-w-[160px] md:max-w-[180px] lg:max-w-[200px]"
             />
