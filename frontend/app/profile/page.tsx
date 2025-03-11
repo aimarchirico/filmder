@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import PageContainer from '@/components/PageContainer';
 import SplashScreen from '@/components/SplashScreen';
-import useUser from '@/hooks/User';
 import useMovies from '@/hooks/Movies';
 import useFriends from '@/hooks/Friends';
 import { createClient } from '@/utils/supabase/client';
