@@ -16,12 +16,11 @@ const MenuDropdown = () => {
       }
     }
 
-    // Add event listener when menu is open
     if (isMenuOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
 
-    // Cleanup event listener
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -34,7 +33,7 @@ const MenuDropdown = () => {
   };
 
   return (
-    <div className="absolute top-4 right-4" ref={menuRef}>
+    <div className="absolute top-4 right-4 z-50" ref={menuRef}>
       <button
         onClick={() => setIsMenuOpen(!isMenuOpen)}
         className="p-2 hover:bg-purple-700 rounded-lg transition"
@@ -42,7 +41,7 @@ const MenuDropdown = () => {
         <Menu className="w-12 h-12 text-white" />
       </button>
       {isMenuOpen && (
-        <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-gray-900 ring-1 ring-secondary">
+        <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-gray-900 ring-1 ring-secondary z-50">
           <div className="py-1">
             <Link
               href="/home"
@@ -51,22 +50,16 @@ const MenuDropdown = () => {
               Home
             </Link>
             <Link
-              href="/profile"
+              href="/explore"
               className="block px-4 py-2 text-sm text-white hover:bg-gray-800 transition-colors"
             >
-              Profile
+              Explore
             </Link>
             <Link
               href="/movies"
               className="block px-4 py-2 text-sm text-white hover:bg-gray-800 transition-colors"
             >
-              Movies
-            </Link>
-            <Link
-              href="/settings"
-              className="block px-4 py-2 text-sm text-white hover:bg-gray-800 transition-colors"
-            >
-              Settings
+              My Movies
             </Link>
             <Link
               href="/friends"
@@ -74,12 +67,12 @@ const MenuDropdown = () => {
             >
               Friends
             </Link>
-            <button
-              onClick={handleSignOut}
-              className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-800 transition-colors"
+            <Link
+              href="/profile"
+              className="block px-4 py-2 text-sm text-white hover:bg-gray-800 transition-colors"
             >
-              Sign out
-            </button>
+              Profile
+            </Link>
           </div>
         </div>
       )}

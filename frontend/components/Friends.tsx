@@ -7,10 +7,10 @@ export const FriendsBox = ({
   height = "h-[400px]",
 }: FriendsBoxProps) => {
   return (
-    <div className={`flex flex-col items-center w-full ${className}`}>
-      <h2 className="text-2xl font-semibold mb-4">{title}</h2>
+    <div className={`my-4 flex flex-col items-center w-full ${className}`}>
+      <h2 className="text-xl font-semibold mb-3">{title}</h2>
       <div
-        className={`border-secondary border-4 rounded-2xl p-4 w-full md:w-3/4 ${height} min-h-[100px] overflow-y-auto pr-4 flex flex-col scrollbar`}
+        className={`border-secondary border-2 rounded-xl p-3 w-full md:w-[90%] ${height} min-h-[50px] overflow-y-auto flex flex-col scrollbar bg-gray-900 shadow-md`}
       >
         {children}
       </div>
@@ -23,21 +23,25 @@ export const FindFriends = ({
   setEmail,
   onClick,
 }: FindFriendsProps) => {
-  return <><h2 className="text-2xl font-semibold mt-6 mb-4">Find Friends</h2><div className="p-4 w-full md:w-3/4 flex flex-col">
-    <label className="mb-2">E-mail:</label>
-    <input
-      type="email"
-      value={email}
-      onChange={(e) => setEmail(e.target.value)}
-      className="w-full p-3 border-2 border-secondary rounded-2xl text-white bg-gray-800 focus:outline-none"
-      placeholder="Enter friend's email" />
-    <button
-      onClick={onClick}
-      className="mt-4 px-6 py-3 bg-secondary text-white rounded-2xl hover:bg-purple-700 transition"
-    >
-      Send Friend Request
-    </button>
-  </div></>
+  return (
+    <FriendsBox title="Find Friends" height="auto" className="mb-4">
+      <div className="flex flex-col gap-2 w-full">
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full p-2 border border-secondary rounded-lg text-white bg-gray-800 focus:outline-none focus:ring-2 focus:ring-secondary"
+          placeholder="Enter friend's email" 
+        />
+        <button
+          onClick={onClick}
+          className="px-4 py-2 bg-secondary text-white rounded-lg hover:bg-purple-700 transition-colors"
+        >
+          Send Friend Request
+        </button>
+      </div>
+    </FriendsBox>
+  );
 }
 
 

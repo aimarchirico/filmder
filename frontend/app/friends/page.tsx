@@ -1,31 +1,26 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import React, { useState, useEffect } from "react";
-import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
-import useFriends from "@/hooks/Friends";
-import SplashScreen from "@/components/SplashScreen";
+import { useState, useEffect } from 'react';
+import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
+import PageContainer from '@/components/PageContainer';
 import { FriendsBox, FindFriends } from "@/components/Friends";
-import { Friend, FriendRequest } from "@/types/Friends";
-import MenuDropdown from "@/components/Menu";
+import useUser from '@/hooks/User';
+import SplashScreen from '@/components/SplashScreen';
+import useFriends from '@/hooks/Friends';
 
 export default function FriendsPage() {
-  const router = useRouter();
-  const { getFriends, updateFriendRequest } = useFriends();
-
-  // State for friend requests and user friends
-  const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
-  const [friendsList, setFriendsList] = useState<Friend[]>([]);
-  const [email, setEmail] = useState<string>("");
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [friendsList, setFriendsList] = useState<any[]>([]);
+  const [friendRequests, setFriendRequests] = useState<any[]>([]);
+  const [friendEmail, setFriendEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-
-  // Fetch both friends and friend requests on component mount
+  const { getFriends, updateFriendRequest } = useFriends();
+  // Fetch both friends and friend requests
   useEffect(() => {
     async function fetchFriendsData() {
       try {
-        setIsLoading(true);
+        setLoading(true);
         const { data, error } = await getFriends();
 
         if (error) {
@@ -61,7 +56,7 @@ export default function FriendsPage() {
         console.error("Exception fetching friends data:", err);
         setError("An unexpected error occurred");
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     }
 
@@ -71,7 +66,6 @@ export default function FriendsPage() {
   // Accept friend request
   const handleAccept = async (id: string, email: string) => {
     try {
-      // Call your API to accept the friend request
       const response = await updateFriendRequest(email, "accepted");
 
       if (response.error) {
@@ -83,7 +77,7 @@ export default function FriendsPage() {
       const friend = { id, email };
       setFriendsList((prev) => [...prev, friend]);
 
-      // Remove from pending requests
+      
       setFriendRequests((prev) => prev.filter((req) => req.id !== id));
 
       setSuccessMessage(`Friend request from ${email} accepted!`);
@@ -98,7 +92,6 @@ export default function FriendsPage() {
   // Reject friend request or remove friend
   const handleReject = async (id: string, email: string) => {
     try {
-      // Call API to decline the friend request
       const response = await updateFriendRequest(email, "declined");
 
       if (response.error) {
@@ -110,7 +103,6 @@ export default function FriendsPage() {
       setFriendRequests((prev) => prev.filter((req) => req.id !== id));
       setFriendsList((prev) => prev.filter((friend) => friend.id !== id));
 
-      // Determine appropriate message based on where the item was found
       if (id.startsWith('friend-')) {
         setSuccessMessage(`Removed ${email} from friends`);
       } else {
@@ -127,20 +119,20 @@ export default function FriendsPage() {
 
   // Send friend request
   const handleSendRequest = async () => {
-    if (!email.trim()) {
+    if (!friendEmail.trim()) {
       setError("Please enter an email address");
       setTimeout(() => setError(null), 3000);
       return;
     }
 
     try {
-      const response = await updateFriendRequest(email, "pending");
+      const response = await updateFriendRequest(friendEmail, "pending");
 
       if (response.error) {
         setError(response.error);
       } else {
-        setSuccessMessage(`Friend request sent to ${email}`);
-        setEmail(""); // Clear the input field
+        setSuccessMessage(`Friend request sent to ${friendEmail}`);
+        setFriendEmail(""); 
       }
 
       setTimeout(() => {
@@ -154,11 +146,12 @@ export default function FriendsPage() {
     }
   };
 
-  if (isLoading)
+  if (loading) {
     return <SplashScreen />;
+  }
 
   return (
-    <div className="bg-black min-h-screen flex flex-col items-center text-white px-6 py-10 min-w-full">
+    <PageContainer title="FRIENDS">
       {/* Fixed position messages at the top */}
       <div className="fixed top-4 z-50 flex flex-col items-center w-full">
         {error && (
@@ -174,25 +167,20 @@ export default function FriendsPage() {
         )}
       </div>
 
-      
-      <h1 className="flex text-4xl font-bold text-secondary items-center justify-center mt-4">
-        FRIENDS
-      </h1>
 
-      {/* Main Container: Left (Friends List) & Right (Requests + Find Friends) */}
-      <div className="w-3/4 flex flex-col md:flex-row justify-between mt-5">
-        {/* LEFT SIDE - LIST OF MY FRIENDS */}
-        <div className="w-full md:w-1/2 flex flex-col items-center mb-8 md:mb-0">
-        <FriendsBox title="My Friends">
+      <div className="w-full flex flex-col md:flex-row justify-between">
+        {/* Friends list */}
+        <div className="w-full md:w-1/2 flex flex-col items-center mb-0 md:mb-0">
+          <FriendsBox title="My Friends">
             {friendsList.length === 0 ? (
               <p className="text-gray-400">No friends added yet.</p>
             ) : (
               friendsList.map((friend) => (
                 <div
                   key={friend.id}
-                  className="flex justify-between items-center border-2 border-secondary h-14 bg-gray-800 p-2 mb-2 rounded-2xl"
+                  className="flex justify-between items-center h-14 bg-gray-800 p-2 mb-2 rounded-2xl"
                 >
-                  <span>{friend.email}</span>
+                  <span className="truncate max-w-[80%]">{friend.email}</span>
                   <FaTimesCircle
                     className="text-red-500 cursor-pointer hover:text-red-400"
                     size={18}
@@ -206,10 +194,9 @@ export default function FriendsPage() {
           </FriendsBox>
         </div>
 
-        {/* RIGHT SIDE - FRIEND REQUESTS & FIND FRIENDS */}
-        <div className="w-full md:w-1/2 flex flex-col items-center">
-          {/* Friend Requests Section */}
-          <FriendsBox title="Friend Requests" height="h-[220px]">
+        <div className="w-full md:w-1/2 flex flex-col items-center md:pl-4">
+          {/* Friend Requests */}
+          <FriendsBox title="Friend Requests" height="h-[200px]">
             {friendRequests.length === 0 ? (
               <p className="text-gray-400">No friend requests.</p>
             ) : (
@@ -220,13 +207,11 @@ export default function FriendsPage() {
                 >
                   <span className="truncate max-w-[70%]">{request.email}</span>
                   <div className="flex space-x-2">
-                    {/* Accept Friend Request */}
                     <FaCheckCircle
                       className="text-green-500 cursor-pointer hover:text-green-400"
                       size={20}
                       onClick={() => handleAccept(request.id, request.email)}
                     />
-                    {/* Reject Friend Request */}
                     <FaTimesCircle
                       className="text-red-500 cursor-pointer hover:text-red-400"
                       size={20}
@@ -238,16 +223,29 @@ export default function FriendsPage() {
             )}
           </FriendsBox>
 
-          {/* Find Friends Section */}
-          <FindFriends
-          email={email}
-          setEmail={setEmail}
-          onClick={handleSendRequest}
-          />
+          {/* Add Friend Form */}
+          
+          <FriendsBox title="Add Friends" height="h-[130px]">
+            <div className="w-full">
+              <form onSubmit={(e) => {e.preventDefault(); handleSendRequest();}} className="flex flex-col gap-2 w-full">
+              <input
+                type="email"
+                placeholder="Enter your friend's email"
+                value={friendEmail}
+                onChange={(e) => setFriendEmail(e.target.value)}
+                className="w-full bg-gray-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-secondary"
+              />
+              <button
+                type="submit"
+                className="w-full bg-secondary hover:bg-purple-700 text-white py-2 px-4 rounded-lg transition-colors"
+              >
+                Send Request
+              </button>
+              </form>
+            </div>
+          </FriendsBox>
         </div>
       </div>
-      <MenuDropdown/>
-    </div>
-    
+    </PageContainer>
   );
 }

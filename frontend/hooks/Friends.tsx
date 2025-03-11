@@ -1,11 +1,24 @@
-import { createClient } from "@/utils/supabase/client";
-import useUser from "@/hooks/User"
-import { FunctionsHttpError } from '@supabase/supabase-js'
+import { createClient } from '@/utils/supabase/client';
+import useUser from '@/hooks/User';
+import { FunctionsHttpError } from '@supabase/supabase-js';
 
 const useFriends = () => {
-  const supabase: any = createClient();
+  const supabase = createClient();
   const { getUser } = useUser(supabase);
 
+  // Get friend count
+  const getFriendsCount = async (): Promise<number> => {
+    const { data, error } = await getFriends();
+    
+    if (error || !data) {
+      console.error('Error getting friends count:', error);
+      return 0;
+    }
+  
+    return data.accepted?.length || 0;
+  };
+
+  // Update friend request by invoking edge function
   const updateFriendRequest = async (email: string, status: string = 'pending') => {
     const user = await getUser();
     if (!user || !email) {
@@ -30,7 +43,7 @@ const useFriends = () => {
     };
   }
 
-const getFriends = async () => {
+  const getFriends = async () => {
     const user = await getUser();
     if (!user) {
       return { error: 'User not authenticated' };
@@ -57,6 +70,7 @@ const getFriends = async () => {
   return {
     updateFriendRequest,
     getFriends,
+    getFriendsCount,
   }
 }
 
