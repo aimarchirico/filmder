@@ -1,10 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { createClient } from "@/utils/supabase/client";
+import { useState, useEffect } from 'react';
+import PageContainer from '@/components/PageContainer';
+import SplashScreen from '@/components/SplashScreen';
+import useUser from '@/hooks/User';
+import useMovies from '@/hooks/Movies';
+import useFriends from '@/hooks/Friends';
+import { createClient } from '@/utils/supabase/client';
 import { useRouter } from "next/navigation";
 import { User } from "@supabase/supabase-js";
-import MenuDropdown from "@/components/Menu";
 
 export default function ProfilePage() {
   const supabase = createClient();
@@ -12,22 +16,32 @@ export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
   const [fullName, setFullName] = useState<string>("Unknown User");
   const [loading, setLoading] = useState(true);
+  const [likedMovies, setLikedMovies] = useState(0);
+  const [friendsCount, setFriendsCount] = useState(0);
+  
+  const { getLikedMoviesCount } = useMovies();
+  const { getFriendsCount } = useFriends();
 
   useEffect(() => {
     async function fetchUser() {
-      try {
-        const { data, error } = await supabase.auth.getUser();
-        if (error || !data.user) {
-          console.error("Error fetching user:", error);
-          router.push("/login");
-          return;
-        }
-        console.log("User metadata:", data.user.user_metadata);
+      const { data, error } = await supabase.auth.getUser();
+      if (error || !data.user) {
+        console.error("Error fetching user:", error);
+        router.push("/login");
+      } else {
         setUser(data.user);
         setFullName(data.user.user_metadata?.fullName || "Unknown User");
-      } catch (err) {
-        console.error("Unexpected error:", err);
-        router.push("/login");
+        
+        // Fetch additional stats
+        try {
+          const moviesCount = await getLikedMoviesCount();
+          const friends = await getFriendsCount();
+          
+          setLikedMovies(moviesCount);
+          setFriendsCount(friends);
+        } catch (error) {
+          console.error("Error fetching user stats:", error);
+        }
       }
       setLoading(false);
     }
@@ -36,49 +50,70 @@ export default function ProfilePage() {
   }, []);
   
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push("/login");
+  };
+
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center text-white">Loading...</div>;
+    return <SplashScreen />;
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-black text-white px-6 py-10 mx-auto max-w-lg">
-      <MenuDropdown />
-
-      <h1 className="flex text-4xl font-bold text-secondary items-center justify-center mt-4">
-        PROFILE
-      </h1>
-
-      <div className="flex flex-col items-center justify-center mt-4">
-        <svg className="w-20 h-20 text-secondary" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-          <path fillRule="evenodd" d="M12 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm-2 9a4 4 0 0 0-4 4v1a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-1a4 4 0 0 0-4-4h-4Z" clipRule="evenodd"/>
-        </svg>
-
-        {user ? (
-          <div className="font-semibold">
-            <p className="mb-2">Name:</p>
-            <p className="text-lg font-normal p-2 border-2 border-secondary rounded-2xl bg-gray-800 w-80 text-center">
-              {fullName}
-            </p>
-
-            <p className="mt-4 mb-2">Email:</p>
-            <p className="text-lg font-normal p-2 border-2 border-secondary bg-gray-800 w-80 text-center rounded-2xl">
-              {user.email}
-            </p>
+    <PageContainer title="PROFILE">
+      <div className="max-w-lg mx-auto">
+        {/* Profile Content */}
+        <div className="border-secondary border-2 bg-gray-900 p-6 rounded-lg shadow-lg">
+          <div className="flex items-center space-x-4 mb-6">
+            <div className="bg-secondary rounded-full h-20 w-20 flex items-center justify-center text-2xl font-bold text-white">
+              {user?.email?.charAt(0).toUpperCase() || "U"}
+            </div>
+            <div>
+              <h2 className="text-white text-xl font-semibold">{fullName}</h2>
+              <p className="text-gray-400">{user?.email}</p>
+            </div>
           </div>
-        ) : (
-          <p className="text-red-500">No user found.</p>
-        )}
-
-        <button
-          className="mt-10 px-6 py-2 bg-secondary text-white rounded-2xl shadow-md hover:bg-purple-700 transition"
-          onClick={async () => {
-            await supabase.auth.signOut();
-            router.push("/login");
-          }}
-        >
-          Sign Out
-        </button>
+          
+          {/* Profile Stats */}
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="bg-gray-800 p-4 rounded-lg">
+              <p className="text-secondary text-2xl font-bold">{likedMovies}</p>
+              <p className="text-gray-400">Liked Movies</p>
+            </div>
+            <div className="bg-gray-800 p-4 rounded-lg">
+              <p className="text-secondary text-2xl font-bold">{friendsCount}</p>
+              <p className="text-gray-400">Friends</p>
+            </div>
+          </div>
+          
+          {/* Account Info Section */}
+          <div className="mt-6">
+            <h3 className="text-white text-lg font-semibold mb-3">Account Information</h3>
+            <div className="space-y-3">
+              <div>
+                <label className="text-gray-400 block mb-1">Email</label>
+                <p className="text-white bg-gray-800 px-3 py-2 rounded">{user?.email}</p>
+              </div>
+              <div>
+                <label className="text-gray-400 block mb-1">Member Since</label>
+                <p className="text-white bg-gray-800 px-3 py-2 rounded">
+                  {user?.created_at ? new Date(user.created_at).toLocaleDateString() : "Unknown"}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          {/* Sign Out Button */}
+          <div className="mt-8">
+            <button 
+              onClick={handleSignOut}
+              className="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg transition-colors"
+            >
+              Sign Out
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }
