@@ -10,7 +10,8 @@ import { GenreDropdown, MovieCard } from "@/components/Movies";
 import SplashScreen from "@/components/SplashScreen";
 import useUser from "@/hooks/User";
 import { redirect } from "next/navigation";
-import MenuDropdown from "@/components/Menu";
+import PageHeader from "@/components/PageHeader";
+import PageContainer from "@/components/PageContainer";
 
 export default function HomePage() {
   
@@ -24,7 +25,7 @@ export default function HomePage() {
   const [isGenreDropdownOpen, setIsGenreDropdownOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [cards, setCards] = useState<Movie[]>([]);
-  const { fetchGenres, fetchMovieBatch, rateMovie } = useMovies();
+  const { fetchGenres, fetchMovieBatchLegacy: fetchMovieBatch, rateMovie } = useMovies();
   const [hasMoreMovies, setHasMoreMovies] = useState(true);
 const { getUser } = useUser(supabase)
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
@@ -48,6 +49,27 @@ const { getUser } = useUser(supabase)
     };
     fetchAndSetGenres();
   }, []);
+
+  
+  // Add keyboard event handler
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (!cards.length || isLoading) return;
+      
+      if (event.key === "ArrowLeft") {
+        handleButtonClick(false); 
+      } else if (event.key === "ArrowRight") {
+        handleButtonClick(true); 
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [cards, isLoading]); 
+
 
   const fetchMoreMovies = async (reset: boolean) => {
     setIsLoading(true);
@@ -83,81 +105,99 @@ const { getUser } = useUser(supabase)
     if (direction === "left" || direction === "right") {
       setSwipeDirection(direction as "left" | "right");
       setTimeout(() => setSwipeDirection(null), 300);
-
+  
       await rateMovie(movieId, direction === "right");
-
       setCards((prevCards) => prevCards.filter((card) => card.id !== movieId));
+    } else if (direction === "up" || direction === "down") {
+      // Navigate to movie info page on up/down swipe
+      const movie = cards.find(card => card.id === movieId);
+      if (movie) {
+        window.location.href = `/info/${movieId}`;
+      }
     }
   };
-
-
 
   const handleButtonClick = async (isLiked: boolean) => {
     swiped(isLiked ? "right" : "left", cards[0].id);
   };
 
   return (
-
     isCheckingAuth ? <SplashScreen/> :  
-    <div className="min-h-screen flex flex-col items-center justify-start pt-16 bg-black text-white">
-      <h1 className="text-4xl font-bold text-secondary mb-4">{"FILMDER"}</h1>
-
-      <GenreDropdown
-        isGenreDropdownOpen={isGenreDropdownOpen}
-        setIsGenreDropdownOpen={setIsGenreDropdownOpen}
-        genres={genres}
-        selectedGenres={selectedGenres}
-        setSelectedGenres={setSelectedGenres}
-      />
-
-      <div className="relative inline-block">
-        <button
-          onClick={() => handleButtonClick(false)}
-          className={`absolute sm:absolute bottom-[-9rem] sm:bottom-auto left-[3rem] sm:left-[-90px] sm:translate-x-0
-    sm:top-1/2 sm:-translate-y-1/2 p-4 rounded-lg transition shadow-md ${
-      swipeDirection === "left"
-        ? "bg-red-600 hover:bg-red-700"
-        : "bg-secondary hover:bg-purple-700"
-    }`}
-          disabled={isLoading}
-        >
-          <ThumbsDown className="w-10 h-10 text-white" />
-        </button>
-
-        <button
-          onClick={() => handleButtonClick(true)}
-          className={`absolute sm:absolute bottom-[-9rem] sm:bottom-auto right-[3rem] sm:right-[-90px] sm:translate-x-0
-    sm:top-1/2 sm:-translate-y-1/2 p-4 rounded-lg transition shadow-md ${
-      swipeDirection === "right"
-        ? "bg-green-600 hover:bg-green-700"
-        : "bg-secondary hover:bg-purple-700"
-    }`}
-          disabled={isLoading}
-        >
-          <ThumbsUp className="w-10 h-10 text-white" />
-        </button>
-
-        <div className="w-64 h-96 relative">
-          <div className="absolute top-0 left-0 w-full h-full">
-            <MovieCard isLoading={isLoading} />
-          </div>
-          {cards.length > 0 && !isLoading ? (
-            [...cards].reverse().map((movie) => (
-              <TinderCard
-                key={movie.key}
-                className={`absolute top-0 left-0 w-full h-full`}
-                onSwipe={(dir) => swiped(dir, movie.id)}
-                preventSwipe={["up", "down"]}
-              >
-                <MovieCard currentMovie={movie} isLoading={isLoading} />
-              </TinderCard>
-            ))
-          ) : null }
+    <PageContainer title="FILMDER">
+      <div className="flex flex-col items-center justify-center w-full">
+        {/* Genre dropdown centered */}
+        <div className="w-full max-w-md mb-6">
+          <GenreDropdown
+            isGenreDropdownOpen={isGenreDropdownOpen}
+            setIsGenreDropdownOpen={setIsGenreDropdownOpen}
+            genres={genres}
+            selectedGenres={selectedGenres}
+            setSelectedGenres={setSelectedGenres}
+          />
         </div>
-      </div>
 
-      <MenuDropdown
-      />
-    </div>
+        {/* Movie card container */}
+        <div className="w-64 h-96 relative">
+          
+            {/* Dislike button */}
+            <button
+              onClick={() => handleButtonClick(false)}
+              className={`absolute z-0 
+                md:left-[-60px] md:top-1/2 md:transform md:-translate-y-1/2 md:w-16 md:h-16
+                left-[33%] bottom-[-85px] transform -translate-x-1/2 w-16 h-16
+                p-4 rounded-lg transition shadow-lg flex items-center justify-center ${
+                  swipeDirection === "left"
+                    ? "bg-red-600 hover:bg-red-700"
+                    : "bg-secondary hover:bg-purple-700"
+                }`}
+              disabled={isLoading}
+            >
+              <ThumbsDown className="w-8 h-8 text-white" />
+            </button>
+
+            {/* Like button */}
+            <button
+              onClick={() => handleButtonClick(true)}
+              className={`absolute z-0
+                md:right-[-60px] md:top-1/2 md:transform md:-translate-y-1/2 md:w-16 md:h-16
+                right-[33%] bottom-[-85px] transform translate-x-1/2 w-16 h-16
+                p-4 rounded-lg transition shadow-lg flex items-center justify-center ${
+                  swipeDirection === "right"
+                    ? "bg-green-600 hover:bg-green-700"
+                    : "bg-secondary hover:bg-purple-700"
+                }`}
+              disabled={isLoading}
+            >
+              <ThumbsUp className="w-8 h-8 text-white" />
+            </button>
+            
+            <div className="absolute top-0 left-0 w-full h-full">
+              <MovieCard isLoading={isLoading} />
+            </div>
+            {cards.length > 0 && !isLoading ? (
+              [...cards].reverse().map((movie) => (
+                <TinderCard
+                  key={movie.key}
+                  className={`absolute top-0 left-0 w-full h-full`}
+                  onSwipe={(dir) => swiped(dir, movie.id)}
+                >
+                  <MovieCard currentMovie={movie} isLoading={isLoading} />
+                </TinderCard>
+              ))
+            ) : null }
+        </div>
+        
+      
+        <div className="relative w-full max-w-md mx-auto flex justify-center items-center mb-20">
+        </div>
+        
+         {cards.length === 0 && !isLoading && !hasMoreMovies && (
+          <div className="text-center text-white mt-4">
+            <p className="text-xl">No more movies to show right now.</p>
+            <p className="text-sm mt-2">Try selecting different genres or check back later!</p>
+          </div>
+        )}
+      </div>
+    </PageContainer>
   );
 }
