@@ -1,11 +1,11 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image"; 
 import { GenreDropdownProps, MovieCardProps, SmallMovieCardProps } from "@/types/Movies"
 import Link from "next/link";
 import { Menu } from "lucide-react";
 import { Check, X, ThumbsUp, ThumbsDown } from "lucide-react";
 import { useRouter } from "next/navigation";
-
+import useMovies from "@/hooks/Movies";
 
 export const MovieCard: React.FC<MovieCardProps> = ({ currentMovie, isLoading }) => {
   const router = useRouter();
@@ -127,18 +127,41 @@ export const GenreDropdown: React.FC<GenreDropdownProps> = ({
 export const SmallMovieCard: React.FC<SmallMovieCardProps> = ({
   movie,
   showControls = true,
-  showLikeDislike = false,
-  removeOnAction = false,
-  onLike,
-  onDislike,
+  onRatingChange,
   onRemove,
   className = "",
   userRating = null,
 }) => {
   const router = useRouter();
+  const { rateMovie } = useMovies();
+  const [rating, setRating] = useState<string | null>(userRating);
+
+  // Update internal state when prop changes
+  useEffect(() => {
+    setRating(userRating);
+  }, [userRating]);
 
   const handleClick = () => {
     router.push(`/info/${movie.id}`);
+  };
+
+  const handleRateMovie = async (isLiked: boolean) => {
+    try {
+      await rateMovie(movie.id, isLiked);
+      const newRating = isLiked ? 'like' : 'dislike';
+      setRating(newRating);
+      
+      if (onRatingChange) {
+        onRatingChange(movie.id, newRating);
+      }
+      
+      if (onRemove && !isLiked) {
+        // For "My Movies" page, remove from view when disliked
+        onRemove(movie.id);
+      }
+    } catch (error) {
+      console.error(`Error ${isLiked ? 'liking' : 'disliking'} movie:`, error);
+    }
   };
 
   return (
@@ -148,43 +171,20 @@ export const SmallMovieCard: React.FC<SmallMovieCardProps> = ({
     >
       <img 
         src={movie.image_url} 
-        alt={movie.name} 
-        className="w-full h-full object-cover cursor-pointer" 
+        alt={movie.name}
         onClick={handleClick}
+        className="object-cover w-full h-full cursor-pointer"
       />
       
-      {/* Movie title - always visible */}
-      <div 
-        className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white p-2 text-xs cursor-pointer"
-        onClick={handleClick}
-      >
-        <span className="truncate block">{movie.name}</span>
-      </div>
-      
-      {/* Control buttons - always visible */}
       {showControls && (
-        <div 
-          className={`absolute ${showLikeDislike ? 'top-2 right-2' : 'top-2 right-2'} flex ${showLikeDislike ? 'flex-col' : ''} gap-1`}
-          onClick={(e) => e.stopPropagation()} 
-        >
-          {!showLikeDislike && (
-            <button 
-              className="bg-black bg-opacity-70 p-1.5 rounded-full hover:bg-opacity-90 transition"
-              onClick={() => onRemove && onRemove(movie.id)}
-              aria-label="Remove movie"
-              title="Remove from favorites"
-            >
-              <X className="w-5 h-5 text-white" />
-            </button>
-          )}
+        <div className="absolute top-2 right-2 flex flex-col gap-1">
+
           
-          {showLikeDislike && (
-            <>
               <button 
                 className={`bg-black bg-opacity-70 p-1.5 rounded-full transition ${
-                  userRating === 'like' ? 'bg-green-800 bg-opacity-90' : 'hover:bg-green-900'
+                  rating === 'like' ? 'bg-green-600 bg-opacity-90' : 'hover:bg-green-900'
                 }`}
-                onClick={() => onLike && onLike(movie.id)}
+                onClick={() => handleRateMovie(true)}
                 aria-label="Like movie"
                 title="Like"
               >
@@ -192,18 +192,27 @@ export const SmallMovieCard: React.FC<SmallMovieCardProps> = ({
               </button>
               <button 
                 className={`bg-black bg-opacity-70 p-1.5 rounded-full transition mt-1 ${
-                  userRating === 'dislike' ? 'bg-red-800 bg-opacity-90' : 'hover:bg-red-900'
+                  rating === 'dislike' ? 'bg-red-600 bg-opacity-90' : 'hover:bg-red-900'
                 }`}
-                onClick={() => onDislike && onDislike(movie.id)}
+                onClick={() => handleRateMovie(false)}
                 aria-label="Dislike movie"
                 title="Dislike"
               >
                 <ThumbsDown className="w-5 h-5 text-white" />
               </button>
-            </>
-          )}
+           
         </div>
       )}
+      
+      <div 
+        className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-2 pt-6"
+        onClick={handleClick}
+      >
+        <h3 className="text-sm text-white font-medium line-clamp-2 cursor-pointer">
+          {movie.name}
+        </h3>
+        <p className="text-xs text-gray-300">{movie.year}</p>
+      </div>
     </div>
   );
 };
