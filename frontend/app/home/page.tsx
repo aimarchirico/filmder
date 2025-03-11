@@ -10,7 +10,6 @@ import { GenreDropdown, MovieCard } from "@/components/Movies";
 import SplashScreen from "@/components/SplashScreen";
 import useUser from "@/hooks/User";
 import { redirect } from "next/navigation";
-import PageHeader from "@/components/PageHeader";
 import PageContainer from "@/components/PageContainer";
 
 export default function HomePage() {
@@ -19,7 +18,6 @@ export default function HomePage() {
   const [swipeDirection, setSwipeDirection] = useState<"left" | "right" | null>(
     null
   );
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [genres, setGenres] = useState<Genre[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
   const [isGenreDropdownOpen, setIsGenreDropdownOpen] = useState(false);
