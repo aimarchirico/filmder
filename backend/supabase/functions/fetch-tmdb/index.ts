@@ -75,38 +75,67 @@ const fetchAndSetMovies = async (supabase: any) => {
         }
       }
     )
-  const data = await response.json()
-  if (!data.results) throw new Error("No results from TMDB API")
-  allMovies = [...allMovies, ...data.results]
+    const data = await response.json()
+    if (!data.results) throw new Error("No results from TMDB API")
+    allMovies = [...allMovies, ...data.results]
   }
   
   const uniqueMovies = [...new Map(allMovies.reverse().map(movie => [movie.id, movie])).values()]
 
+  // First, insert all movies without trailers to save time
+  const moviesWithoutTrailers = uniqueMovies.map(movie => ({
+    id: movie.id,
+    name: movie.title,
+    year: new Date(movie.release_date).getFullYear(),
+    description: movie.overview,
+    image_url: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+    rating: movie.vote_average,
+    genre_ids: movie.genre_ids,
+  }));
 
-  const movies = await Promise.all(
-    uniqueMovies.map(async (movie) => {
-      const trailerUrl = await fetchMovieTrailer(movie.id);
-      await new Promise(resolve => setTimeout(resolve, 50));
-      return {
-        id: movie.id,
-        name: movie.title,
-        year: new Date(movie.release_date).getFullYear(),
-        description: movie.overview,
-        image_url: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
-        rating: movie.vote_average,
-        genre_ids: movie.genre_ids,
-        trailer_url: trailerUrl
-      };
-    })
-  );
-
-  const { error } = await supabase
+  const { error: initialError } = await supabase
     .from("movies")
-    .upsert(movies.map(({genre_ids, ...movie}) => movie))
-    .select()
+    .upsert(moviesWithoutTrailers.map(({genre_ids, ...movie}) => movie))
+    
+  if (initialError) throw initialError
 
-  if (error) throw error
-  return movies
+  // Get all movies that don't have trailers yet
+  const { data: moviesWithoutTrailerData, error: selectError } = await supabase
+    .from("movies")
+    .select("id")
+    .is("trailer_url", null);
+  
+  if (selectError) throw selectError
+
+  // Only fetch trailers for movies that don't have one
+  console.log(`Fetching trailers for ${moviesWithoutTrailerData.length} movies without trailers`);
+  
+  let updatedCount = 0;
+  for (const movie of moviesWithoutTrailerData) {
+    try {
+      const trailerUrl = await fetchMovieTrailer(movie.id);
+      if (trailerUrl) {
+        const { error: updateError } = await supabase
+          .from("movies")
+          .update({ trailer_url: trailerUrl })
+          .eq("id", movie.id);
+        
+        if (!updateError) {
+          updatedCount++;
+        }
+      }
+      // delay to avoid rate limiting
+      await new Promise(resolve => setTimeout(resolve, 200));
+    } catch (error) {
+      console.error(`Error fetching trailer for movie ${movie.id}:`, error);
+    }
+  }
+
+  return {
+    totalMovies: uniqueMovies.length,
+    updatedTrailers: updatedCount,
+    movies: moviesWithoutTrailers
+  };
 }
 
 const setMovieGenres = async (supabase: any, movies: any[]) => {
@@ -124,7 +153,6 @@ const setMovieGenres = async (supabase: any, movies: any[]) => {
   if (error) throw error
   return movieGenres
 }
-
 
 serve(async (req) => {
   // Add CORS headers
@@ -172,15 +200,15 @@ serve(async (req) => {
     if (!adminData) {
       return new Response(JSON.stringify({ error: 'Admin access required' }), { status: 403 })
     }
-
     const genres = await fetchAndSetGenres(supabase)
-    const movies = await fetchAndSetMovies(supabase)
-    const movieGenres = await setMovieGenres(supabase, movies)
+    const movieResult = await fetchAndSetMovies(supabase)
+    const movieGenres = await setMovieGenres(supabase, movieResult.movies)
 
     return new Response(
       JSON.stringify({ 
         genres: genres.length, 
-        movies: movies.length, 
+        movies: movieResult.totalMovies, 
+        updatedTrailers: movieResult.updatedTrailers,
         relationships: movieGenres.length 
       }),
       { 
