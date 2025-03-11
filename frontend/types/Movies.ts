@@ -21,6 +21,18 @@ export interface MovieCardProps {
   isLoading: boolean;
 }
 
+export interface SmallMovieCardProps {
+  movie: Movie;
+  showControls?: boolean;
+  showLikeDislike?: boolean;
+  removeOnAction?: boolean;
+  onLike?: (movieId: number | string) => void;
+  onDislike?: (movieId: number | string) => void;
+  onRemove?: (movieId: number | string) => void;
+  userRating?: string | null; 
+  className?: string;
+}
+
 export interface GenreDropdownProps {
   isGenreDropdownOpen: boolean;
   setIsGenreDropdownOpen: React.Dispatch<boolean>;
