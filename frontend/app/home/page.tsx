@@ -123,7 +123,7 @@ const { getUser } = useUser(supabase)
     isCheckingAuth ? <SplashScreen/> :  
     <PageContainer title="FILMDER">
       <div className="flex flex-col items-center justify-center w-full">
-        {/* Genre dropdown centered */}
+        {/* Genre dropdown */}
         <div className="w-full max-w-md mb-6">
           <GenreDropdown
             isGenreDropdownOpen={isGenreDropdownOpen}
@@ -135,7 +135,7 @@ const { getUser } = useUser(supabase)
         </div>
 
         {/* Movie card container */}
-        <div className="w-64 h-96 relative">
+        <div className="w-80 h-[480px] md:w-64 md:h-96 relative">
           
             {/* Dislike button */}
             <button
