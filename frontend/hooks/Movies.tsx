@@ -19,7 +19,7 @@ const useMovies = () => {
     // insert rating
     const { error } = await supabase
       .from("user_movies")
-      .insert([{ user_id: user.id, movie_id: movieId, isLiked }]);
+      .upsert([{ user_id: user.id, movie_id: movieId, isLiked }]);
 
     if (error) {
       console.error("Error rating movie:", error);
@@ -241,6 +241,32 @@ const useMovies = () => {
     return data.isLiked ? 'like' : 'dislike';
   };
 
+  // Get ratings for multiple movies at once
+  const getUserMovieRatings = async (movieIds: number[]): Promise<{[key: number]: string}> => {
+    const user = await getUser();
+    if (!user || !movieIds.length) return {};
+
+    const { data, error } = await supabase
+      .from("user_movies")
+      .select("movie_id, isLiked")
+      .eq("user_id", user.id)
+      .in("movie_id", movieIds);
+    
+    const ratings: {[key: number]: string} = {};
+    
+    if (error || !data) {
+      console.error("Error fetching movie ratings:", error);
+      return {};
+    }
+
+    // Only add entries for movies that have ratings in the database
+    data.forEach((item: { movie_id: number, isLiked: boolean }) => {
+      ratings[item.movie_id] = item.isLiked ? 'like' : 'dislike';
+    });
+
+    return ratings;
+  };
+
   // get count of like movies
   const getLikedMoviesCount = async (): Promise<number> => {
     const user = await getUser();
@@ -268,6 +294,7 @@ const useMovies = () => {
     fetchLikedMovies,
     rateMovie,
     getUserMovieRating,
+    getUserMovieRatings, // Add the new function
     getLikedMoviesCount 
   };
 };

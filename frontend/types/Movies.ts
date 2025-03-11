@@ -25,9 +25,7 @@ export interface SmallMovieCardProps {
   movie: Movie;
   showControls?: boolean;
   showLikeDislike?: boolean;
-  removeOnAction?: boolean;
-  onLike?: (movieId: number | string) => void;
-  onDislike?: (movieId: number | string) => void;
+  onRatingChange?: (movieId: number | string, rating: string) => void;
   onRemove?: (movieId: number | string) => void;
   userRating?: string | null; 
   className?: string;
