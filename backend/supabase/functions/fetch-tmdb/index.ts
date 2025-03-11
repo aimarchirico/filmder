@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 
-// Fetches top 1000 rated movies from TMDB and stores in "movies" table
+// Fetches top rated movies from TMDB and stores in "movies" table
 
 interface movieResponse {
   id: number,
@@ -65,7 +65,7 @@ const fetchMovieTrailer = async (movieId: number) => {
 const fetchAndSetMovies = async (supabase: any) => {
   let allMovies: movieResponse[] = []
 
-  for (let page = 1; page <= 50; page++) {
+  for (let page = 1; page <= 250; page++) {
     const response = await fetch(
       `https://api.themoviedb.org/3/movie/top_rated?page=${page}`,
       {
