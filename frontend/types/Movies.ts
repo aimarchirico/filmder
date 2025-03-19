@@ -17,8 +17,9 @@ export interface Movie {
 }
 
 export interface MovieCardProps {
-  currentMovie?: Movie ;
+  currentMovie?: Movie;
   isLoading: boolean;
+  preventClick?: boolean;
 }
 
 export interface SmallMovieCardProps {
