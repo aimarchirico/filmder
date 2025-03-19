@@ -27,6 +27,7 @@ export default function HomePage() {
   const [hasMoreMovies, setHasMoreMovies] = useState(true);
 const { getUser } = useUser(supabase)
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [justSwiped, setJustSwiped] = useState(false);
  
   useEffect(() => {
     async function checkAuth() {
@@ -100,6 +101,11 @@ const { getUser } = useUser(supabase)
   }, [cards.length, isLoading]);
 
   const swiped = async (direction: string, movieId: number) => {
+    setJustSwiped(true);
+    
+    // Reset the flag after a delay
+    setTimeout(() => setJustSwiped(false), 300);
+    
     if (direction === "left" || direction === "right") {
       setSwipeDirection(direction as "left" | "right");
       setTimeout(() => setSwipeDirection(null), 300);
@@ -179,7 +185,7 @@ const { getUser } = useUser(supabase)
                   className={`absolute top-0 left-0 w-full h-full`}
                   onSwipe={(dir) => swiped(dir, movie.id)}
                 >
-                  <MovieCard currentMovie={movie} isLoading={isLoading} />
+                  <MovieCard currentMovie={movie} isLoading={isLoading} preventClick={justSwiped} />
                 </TinderCard>
               ))
             ) : null }
