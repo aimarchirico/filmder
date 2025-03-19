@@ -7,10 +7,16 @@ import { Check, X, ThumbsUp, ThumbsDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 import useMovies from "@/hooks/Movies";
 
-export const MovieCard: React.FC<MovieCardProps> = ({ currentMovie, isLoading }) => {
+export const MovieCard: React.FC<MovieCardProps> = ({ currentMovie, isLoading, preventClick = false }) => {
   const router = useRouter();
 
   const handleCardClick = (e: any) => {
+    // Don't navigate if just swiped
+    if (preventClick) {
+      e.preventDefault();
+      return;
+    }
+    
     e.stopPropagation(); // Stop event propagation
     if (currentMovie && currentMovie.id) {
       router.push(`/info/${currentMovie.id}`);
