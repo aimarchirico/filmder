@@ -1,62 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+  <!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
 
 
-    <!-- Root Page -->
   <url>
-    <loc>https://filmder.chirico.no</loc>
-    <lastmod>2025-05-05</lastmod>
-    <priority>1.0</priority>
+    <loc>https://filmder.chirico.no/</loc>
+    <lastmod>2025-05-05T11:48:33+00:00</lastmod>
+    <priority>1.00</priority>
   </url>
-
-  <!-- Home Page -->
   <url>
     <loc>https://filmder.chirico.no/home</loc>
-    <lastmod>2025-05-05</lastmod>
-    <priority>1.0</priority>
+    <lastmod>2025-05-05T11:48:33+00:00</lastmod>
+    <priority>0.80</priority>
   </url>
-
-    <!-- Login Page -->
   <url>
     <loc>https://filmder.chirico.no/login</loc>
-    <lastmod>2025-05-05</lastmod>
-    <priority>1.0</priority>
+    <lastmod>2025-05-05T11:48:33+00:00</lastmod>
+    <priority>0.80</priority>
   </url>
-
-  
-    <!-- Signup Page -->
   <url>
     <loc>https://filmder.chirico.no/signup</loc>
-    <lastmod>2025-05-05</lastmod>
-    <priority>1.0</priority>
+    <lastmod>2025-05-05T11:48:33+00:00</lastmod>
+    <priority>0.80</priority>
   </url>
-
-  <!-- Explore Page -->
   <url>
     <loc>https://filmder.chirico.no/explore</loc>
-    <lastmod>2025-05-05</lastmod>
-    <priority>0.9</priority>
+    <lastmod>2025-05-05T11:48:33+00:00</lastmod>
+    <priority>0.80</priority>
   </url>
-
-  <!-- My Movies Page -->
   <url>
     <loc>https://filmder.chirico.no/movies</loc>
-    <lastmod>2025-05-05</lastmod>
-    <priority>0.8</priority>
+    <lastmod>2025-05-05T11:48:33+00:00</lastmod>
+    <priority>0.80</priority>
   </url>
-
-  <!-- Friends Page -->
   <url>
     <loc>https://filmder.chirico.no/friends</loc>
-    <lastmod>2025-05-05</lastmod>
-    <priority>0.8</priority>
+    <lastmod>2025-05-05T11:48:33+00:00</lastmod>
+    <priority>0.80</priority>
   </url>
-
-  <!-- Profile Page -->
   <url>
     <loc>https://filmder.chirico.no/profile</loc>
-    <lastmod>2025-05-05</lastmod>
-    <priority>0.7</priority>
+    <lastmod>2025-05-05T11:48:33+00:00</lastmod>
+    <priority>0.80</priority>
   </url>
+
 
 </urlset>
