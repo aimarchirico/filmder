@@ -4,21 +4,21 @@
 
     <!-- Root Page -->
   <url>
-    <loc>https://www.filmder.chirico.no</loc>
+    <loc>https://filmder.chirico.no</loc>
     <lastmod>2025-05-05</lastmod>
     <priority>1.0</priority>
   </url>
 
   <!-- Home Page -->
   <url>
-    <loc>https://www.filmder.chirico.no/home</loc>
+    <loc>https://filmder.chirico.no/home</loc>
     <lastmod>2025-05-05</lastmod>
     <priority>1.0</priority>
   </url>
 
     <!-- Login Page -->
   <url>
-    <loc>https://www.filmder.chirico.no/login</loc>
+    <loc>https://filmder.chirico.no/login</loc>
     <lastmod>2025-05-05</lastmod>
     <priority>1.0</priority>
   </url>
@@ -26,21 +26,21 @@
   
     <!-- Signup Page -->
   <url>
-    <loc>https://www.filmder.chirico.no/signup</loc>
+    <loc>https://filmder.chirico.no/signup</loc>
     <lastmod>2025-05-05</lastmod>
     <priority>1.0</priority>
   </url>
 
   <!-- Explore Page -->
   <url>
-    <loc>https://www.filmder.chirico.no/explore</loc>
+    <loc>https://filmder.chirico.no/explore</loc>
     <lastmod>2025-05-05</lastmod>
     <priority>0.9</priority>
   </url>
 
   <!-- My Movies Page -->
   <url>
-    <loc>https://www.filmder.chirico.no/movies</loc>
+    <loc>https://filmder.chirico.no/movies</loc>
     <lastmod>2025-05-05</lastmod>
     <priority>0.8</priority>
   </url>
