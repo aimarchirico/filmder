@@ -17,7 +17,7 @@ export default function RootLayout({
         {/* Added static links for SEO */}
         <noscript>
           <div>
-            <a href="/">Root</a>
+            <a href="/">Filmder</a>
             <a href="/home">Home</a>
             <a href="/login">Login</a>
             <a href="/signup">Signup</a>
