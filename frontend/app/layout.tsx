@@ -5,6 +5,8 @@ export const metadata = {
   description: 'Filmder web app',
 }
 
+export const runtime = "edge";
+
 export default function RootLayout({
   children,
 }: {
