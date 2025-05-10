@@ -1,5 +1,0 @@
-env:
-  - variable: NEXT_PUBLIC_SUPABASE_URL
-    value: https://mfveaiplvfzrzuvuikie.supabase.co
-  - variable: NEXT_PUBLIC_SUPABASE_ANON_KEY
-    value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1mdmVhaXBsdmZ6cnp1dnVpa2llIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgxNzc4MDksImV4cCI6MjA1Mzc1MzgwOX0.zNEkc6LerxDELl4LeTCcbDB3FAXnr90axTy7d9Es2LA
