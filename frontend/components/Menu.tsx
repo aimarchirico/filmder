@@ -3,6 +3,7 @@ import { createClient } from "@/utils/supabase/client";
 import { Menu } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import InstallPWAButton from "./InstallPWAButton";
 
 const MenuDropdown = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -20,7 +21,6 @@ const MenuDropdown = () => {
       document.addEventListener("mousedown", handleClickOutside);
     }
 
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -34,12 +34,15 @@ const MenuDropdown = () => {
 
   return (
     <div className="absolute top-4 right-4 z-50" ref={menuRef}>
-      <button
-        onClick={() => setIsMenuOpen(!isMenuOpen)}
-        className="p-2 hover:bg-purple-700 rounded-lg transition"
-      >
-        <Menu className="w-12 h-12 text-white" />
-      </button>
+      <div className="flex items-center gap-2">
+        <InstallPWAButton />
+        <button
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          className="p-2 hover:bg-purple-700 rounded-lg transition"
+        >
+          <Menu className="w-12 h-12 text-white" />
+        </button>
+      </div>
       {isMenuOpen && (
         <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-gray-900 ring-1 ring-secondary z-50">
           <div className="py-1">
