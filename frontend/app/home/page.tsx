@@ -192,8 +192,6 @@ const { getUser } = useUser(supabase)
         </div>
         
       
-        <div className="relative w-full max-w-md mx-auto flex justify-center items-center mb-20">
-        </div>
       </div>
     </PageContainer>
   );
